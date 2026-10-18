@@ -1,5 +1,4 @@
 # AI Portfolio Template
-[![CI](https://github.com/Muhammadyousafrana/muhammadyousafrana-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Muhammadyousafrana/muhammadyousafrana-portfolio/actions/workflows/ci.yml)
 
 An AI-powered personal portfolio you deploy on Cloudflare. It renders a single-page site with an AI
 "recruiter chat" that answers questions about your experience, plus a job-description fit-check, all
