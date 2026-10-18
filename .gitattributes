@@ -1,0 +1,4 @@
+# Keep the codegen output byte-stable across checkouts so `content:check` never
+# fails on line-ending conversion.
+shared/content.generated.ts text eol=lf
+content/prose/*.md text eol=lf

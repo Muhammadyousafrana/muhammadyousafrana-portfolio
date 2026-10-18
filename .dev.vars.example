@@ -1,0 +1,44 @@
+# Copy this file to `.dev.vars` and fill in real values for local development
+# (`bun run dev` / `wrangler dev`). `.dev.vars` is gitignored; never commit secrets.
+# These are placeholders only.
+
+# --- Required: AI chat + fit-analysis ---
+# Provider switch. workers-ai uses the Worker AI binding; google-gateway keeps
+# the native Google path through AI Gateway.
+AI_PROVIDER=workers-ai
+# AI Gateway locator (compat-shaped URL). Replace the REPLACE_WITH_* segments with
+# your Cloudflare account id and AI Gateway slug. Both providers use its gateway id.
+CF_AI_BASE_URL=https://gateway.ai.cloudflare.com/v1/REPLACE_WITH_ACCOUNT_ID/REPLACE_WITH_GATEWAY_SLUG/compat
+# Required only for AI_PROVIDER=google-gateway: Authenticated Gateway token.
+#CF_AI_GATEWAY_TOKEN=your-ai-gateway-token
+# Secret used to sign session / challenge state. Use a long random string.
+SECURITY_HMAC_SECRET=replace-with-a-long-random-string
+
+# --- Turnstile bot protection (disabled by default: REQUIRE_TURNSTILE=false) ---
+# Client widget site key. This is a Vite build-time var (VITE_ prefix) embedded in
+# the browser bundle. Vite reads VITE_* from .env / .env.local (or the shell), NOT
+# from .dev.vars — so it does NOT belong in this file. Put it in .env.local instead
+# (left commented here as a reminder, not as a value this file loads):
+#VITE_TURNSTILE_SITE_KEY=your-turnstile-site-key
+# Server-side Turnstile secret (Worker binding).
+TURNSTILE_SECRET_KEY=your-turnstile-secret-key
+# Set to "true" to enforce Turnstile on protected endpoints.
+REQUIRE_TURNSTILE=false
+
+# --- Optional: recruiter SMS contact flow (Twilio). Leave unset to disable. ---
+# Destination phone number for the contact-form SMS handoff.
+#CONTACT_SMS_TO_NUMBER=+15555550123
+#TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#TWILIO_AUTH_TOKEN=your-twilio-auth-token
+#TWILIO_FROM_NUMBER=+15555550100
+
+# --- Optional: AI health probe bearer token ---
+# When set, GET /api/health/ai requires `Authorization: Bearer <token>`.
+#AI_HEALTH_TOKEN=your-health-probe-token
+
+# --- Optional: Wrangler deploy authentication (set in your shell or CI) ---
+# These authenticate the Wrangler CLI itself; they are NOT Worker bindings. You
+# normally export them in your shell/CI rather than keeping them in .dev.vars.
+# predeploy-validate uses CLOUDFLARE_API_TOKEN to decide whether to check remote secrets.
+#CLOUDFLARE_API_TOKEN=your-cloudflare-api-token
+#CLOUDFLARE_ACCOUNT_ID=your-cloudflare-account-id

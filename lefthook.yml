@@ -1,0 +1,22 @@
+glob_matcher: doublestar
+
+pre-commit:
+  parallel: false
+  commands:
+    format:
+      glob:
+        - '*.{css,html,js,json,jsonc,jsx,md,mjs,ts,tsx,yml}'
+        - '.*.{css,html,js,json,jsonc,jsx,md,mjs,ts,tsx,yml}'
+        - '**/*.{css,html,js,json,jsonc,jsx,md,mjs,ts,tsx,yml}'
+      run: bunx prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
+    lint:
+      glob:
+        - '*.{ts,tsx}'
+        - '**/*.{ts,tsx}'
+      run: bunx eslint --cache --fix --no-warn-ignored {staged_files}
+      stage_fixed: true
+    typecheck:
+      run: bun run typecheck
+    knip:
+      run: bun run knip

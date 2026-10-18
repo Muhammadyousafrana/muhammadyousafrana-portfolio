@@ -1,0 +1,40 @@
+
+# Bootstrap marker
+.bootstrap-complete
+
+# Local secrets
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+dev.vars
+dev.vars.*
+.env
+.env.*
+
+# Dependency/install artifacts
+node_modules/
+
+# Build outputs
+dist/
+.wrangler/
+
+# Local caches/generated files
+.eslintcache
+*.tsbuildinfo
+worker-configuration.d.ts
+.DS_Store
+.agents/
+.claude/
+skills-lock.json
+
+# Staging plans
+plans/staging/
+
+# Local GitHub review exports
+GitHub Reviews/*
+!GitHub Reviews/.gitignore
+
+# Python bytecode
+__pycache__/
+
+.serena/

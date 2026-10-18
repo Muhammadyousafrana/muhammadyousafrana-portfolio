@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
+    "types": ["@cloudflare/workers-types"],
+    "lib": ["ES2023", "WebWorker", "DOM.Iterable", "ESNext.Intl"]
+  },
+  "include": ["worker", "shared"],
+  "exclude": ["worker/**/*.test.ts", "shared/**/*.test.ts"]
+}

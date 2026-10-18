@@ -1,0 +1,1 @@
+Full-stack software engineer with eight years building and scaling web platforms across commerce and fintech. I work end to end: TypeScript and Node services, React front ends, PostgreSQL data models, and the AWS infrastructure and observability that keep them reliable. I care about clean interfaces, fast feedback loops, and shipping features that hold up under real traffic.

@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "include": ["files", "exports"],
+  "ignoreDependencies": ["^cloudflare$"],
+  "entry": ["worker/index.ts"],
+  "project": ["src/**/*.{ts,tsx}", "worker/**/*.ts", "shared/**/*.ts", "scripts/**/*.mjs"],
+  "ignoreExportsUsedInFile": true
+}

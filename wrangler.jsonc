@@ -1,0 +1,65 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ai-portfolio",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-03-02",
+  "compatibility_flags": ["nodejs_compat"],
+  // Publish to the account's <name>.<subdomain>.workers.dev URL. Bring your own
+  // custom domain later by adding a `routes` block.
+  "workers_dev": true,
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "APP_CONTROLLER",
+        "class_name": "AppController",
+      },
+    ],
+  },
+  // Single create migration for this brand-new Worker's Durable Object.
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["AppController"],
+    },
+  ],
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "!/api/docs/*"],
+  },
+  "ai": {
+    "binding": "AI",
+    "remote": true,
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+  // Secrets expected via Wrangler: SECURITY_HMAC_SECRET plus contact-flow
+  // secrets below. CF_AI_GATEWAY_TOKEN is needed only for google-gateway.
+  // CONTACT_SMS_TO_NUMBER,
+  // TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER
+  "vars": {
+    // One switch selects the provider-specific model chain. Workers AI uses the
+    // AI binding; google-gateway preserves the native Google + Gateway path.
+    "AI_PROVIDER": "workers-ai",
+    // CF_AI_BASE_URL is a Cloudflare AI Gateway locator. The Worker parses this
+    // compat-shaped URL to extract the account and gateway ids. Each runtime uses
+    // the gateway id through its native transport. The compat suffix is the
+    // required locator shape. Replace
+    // the REPLACE_WITH_* segments with your Cloudflare account id and AI Gateway
+    // slug before deploying (predeploy-validate refuses to deploy the sentinel).
+    "CF_AI_BASE_URL": "https://gateway.ai.cloudflare.com/v1/REPLACE_WITH_ACCOUNT_ID/REPLACE_WITH_GATEWAY_SLUG/compat",
+    "SESSION_COOKIE_NAME": "chat_tenant",
+    "SESSION_COOKIE_MAX_AGE_SECONDS": "2592000",
+    "RATE_LIMIT_WINDOW_SECONDS": "60",
+    "CHAT_RATE_LIMIT_PER_TENANT": "40",
+    "CHAT_RATE_LIMIT_PER_IP": "80",
+    "AI_RATE_LIMIT_PER_TENANT": "12",
+    "AI_RATE_LIMIT_PER_IP": "24",
+    "MAX_CHAT_REQUEST_BYTES": "16384",
+    "MAX_FIT_ANALYZE_BYTES": "24576",
+    "MAX_CLIENT_ERROR_BYTES": "16384",
+    "CLIENT_ERROR_RATE_LIMIT_PER_IP": "30",
+    "REQUIRE_TURNSTILE": "false",
+  },
+}

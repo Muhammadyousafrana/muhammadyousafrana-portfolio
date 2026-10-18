@@ -1,0 +1,13 @@
+.agents
+.wrangler
+dist
+node_modules
+test-results
+.eslintcache
+*.tsbuildinfo
+worker-configuration.d.ts
+shared/content.generated.ts
+bun.lock
+_findings
+plans
+src/.DS_Store

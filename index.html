@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Apply the persisted/system theme before first paint so dark mode does not
+         flash light on load. Mirrors the key and logic in src/hooks/use-theme.ts;
+         useTheme still owns syncing and persistence after hydration. -->
+    <script>
+      ;(function () {
+        try {
+          var saved = localStorage.getItem('theme')
+          var isDark = saved
+            ? saved === 'dark'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+          document.documentElement.classList.toggle('dark', isDark)
+        } catch (e) {}
+      })()
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- SEO/social tags below are injected from content/portfolio.yaml (the seo
+         block) by the transformIndexHtml hook in vite.config.ts; the placeholder
+         tokens are replaced at dev-serve and build time. -->
+    <meta name="description" content="{{SEO_DESCRIPTION}}" />
+    <meta name="theme-color" content="{{SEO_THEME_COLOR}}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{{SEO_OG_TITLE}}" />
+    <meta property="og:description" content="{{SEO_OG_DESCRIPTION}}" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="{{SEO_OG_TITLE}}" />
+    <meta name="twitter:description" content="{{SEO_OG_DESCRIPTION}}" />
+    <title>{{SEO_TITLE}}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      window.addEventListener(
+        'error',
+        (event) => {
+          const isOurAppError = event.filename && event.filename.startsWith(window.location.origin)
+          if (isOurAppError) {
+            navigator.sendBeacon(
+              '/api/client-errors',
+              JSON.stringify({
+                message: event.message,
+                url: window.location.href,
+                userAgent: navigator.userAgent,
+                source: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+                stack: event.error ? event.error.stack : null,
+                timestamp: new Date().toISOString(),
+              })
+            )
+          }
+        },
+        true
+      )
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
