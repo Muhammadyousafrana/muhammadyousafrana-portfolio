@@ -127,19 +127,19 @@ Open `http://localhost:3000` (override with `PORT`). The `predev` hook regenerat
 Copy `.dev.vars.example` to `.dev.vars` for local development. `.dev.vars` is gitignored; never
 commit secrets. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for the full "what lives where" table.
 
-| Variable                                                                                 | Required?                        | Where                                        |
-| ---------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------- |
-| `AI_PROVIDER`                                                                            | Required                         | `wrangler.jsonc` var; `.dev.vars` locally.   |
-| `CF_AI_BASE_URL`                                                                         | Gateway providers only           | `wrangler.jsonc` var; `.dev.vars` locally.   |
-| `GOOGLE_GENERATIVE_AI_API_KEY`                                                           | Direct Google only               | Secret / `.dev.vars`; keep server-side.      |
-| `CF_AI_GATEWAY_TOKEN`                                                                    | Google Gateway only              | Secret / `.dev.vars` (AI Gateway token).     |
-| `SECURITY_HMAC_SECRET`                                                                   | Required                         | Secret / `.dev.vars` (signs tenant cookies). |
-| `REQUIRE_TURNSTILE`                                                                      | Required var (`"false"` default) | `wrangler.jsonc` var.                        |
-| `VITE_TURNSTILE_SITE_KEY`                                                                | If Turnstile enabled             | Build-time env (`.env.local` / shell).       |
-| `TURNSTILE_SECRET_KEY`                                                                   | If Turnstile enabled             | Secret / `.dev.vars`.                        |
-| `CONTACT_SMS_TO_NUMBER`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Optional (SMS handoff)           | Secrets / `.dev.vars`.                       |
-| `AI_HEALTH_TOKEN`                                                                        | Optional                         | Secret; gates `GET /api/health/ai` if set.   |
-| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`                                          | Optional (deploy auth)           | Shell / CI (not runtime bindings).           |
+| Variable                                                                                 | Required?                                  | Where                                               |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------- |
+| `AI_PROVIDER`                                                                            | Required                                   | `wrangler.jsonc` var; `.dev.vars` locally.          |
+| `CF_AI_BASE_URL`                                                                         | Gateway providers only                     | `wrangler.jsonc` var; `.dev.vars` locally.          |
+| `GOOGLE_GENERATIVE_AI_API_KEY`                                                           | Direct Google only                         | Secret / `.dev.vars`; keep server-side.             |
+| `CF_AI_GATEWAY_TOKEN`                                                                    | Google Gateway only                        | Secret / `.dev.vars` (AI Gateway token).            |
+| `SECURITY_HMAC_SECRET`                                                                   | Required                                   | Secret / `.dev.vars` (signs tenant cookies).        |
+| `REQUIRE_TURNSTILE`                                                                      | Required var (`"true"` production default) | `wrangler.jsonc`; local `.dev.vars` may disable it. |
+| `VITE_TURNSTILE_SITE_KEY`                                                                | If Turnstile enabled                       | Build-time env (`.env.local` / shell).              |
+| `TURNSTILE_SECRET_KEY`                                                                   | If Turnstile enabled                       | Secret / `.dev.vars`.                               |
+| `CONTACT_SMS_TO_NUMBER`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Optional (SMS handoff)                     | Secrets / `.dev.vars`.                              |
+| `AI_HEALTH_TOKEN`                                                                        | Optional                                   | Secret; gates `GET /api/health/ai` if set.          |
+| `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`                                          | Optional (deploy auth)                     | Shell / CI (not runtime bindings).                  |
 
 `AI_PROVIDER` selects `workers-ai` (through the `AI` binding), `google-gateway` (Gemini through
 Cloudflare AI Gateway), or `google-ai-studio` (direct Gemini API). The local example defaults to

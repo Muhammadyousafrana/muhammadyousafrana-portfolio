@@ -308,7 +308,9 @@ Walk the user through these steps in order. The **USER ACTION** steps are theirs
    - **SMS contact handoff (Twilio):** `CONTACT_SMS_TO_NUMBER` (the owner's destination number, E.164),
      `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`. If these are not all set, the
      contact flow safely runs in simulation mode.
-   - **Turnstile bot protection:** enable it **after** the base deploy works (see step 11).
+   - **Turnstile bot protection:** production requires it by default. Create the widget and provide
+     its production site key at build time; after the first Worker deploy, set its secret key before
+     exposing AI traffic. Keep the local `.dev.vars` override disabled for local development only.
 9. **USER ACTION - verify the required secrets exist.** Under `bunx wrangler login`,
    `predeploy:validate` cannot inspect remote secrets, so confirm by hand before deploying:
 
@@ -331,9 +333,9 @@ Walk the user through these steps in order. The **USER ACTION** steps are theirs
     > **Recovery note:** `deploy:init` is fresh-Worker-only. If validation later reports an existing
     > Worker with missing secrets, have the user set the secrets, then use normal `bun run deploy`.
 
-11. **Optional - Turnstile:** to enable bot protection, set `REQUIRE_TURNSTILE: "true"` in
-    `wrangler.jsonc`, set the `TURNSTILE_SECRET_KEY` secret, and export a real (non-test)
-    `VITE_TURNSTILE_SITE_KEY` at build time (it is baked into the frontend bundle). See `DEPLOYMENT.md`.
+11. **Verify production bot protection:** confirm `REQUIRE_TURNSTILE: "true"`, the production
+    `TURNSTILE_SECRET_KEY`, and the matching real (non-test) `VITE_TURNSTILE_SITE_KEY` are set before
+    enabling public AI use. See `DEPLOYMENT.md`.
 12. **Optional - custom domain:** with the zone already on the user's Cloudflare account, add a
     `routes` block with `custom_domain: true` to `wrangler.jsonc` and redeploy; Cloudflare provisions
     the DNS record and TLS certificate. See the custom-domain section of `DEPLOYMENT.md`.

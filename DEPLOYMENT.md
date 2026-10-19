@@ -120,8 +120,8 @@ The key is read only by the Worker and must never use a `VITE_` prefix. For depl
 
 ## Online AI verification
 
-For a live integration check, keep `REQUIRE_TURNSTILE=false`, set the optional
-`AI_HEALTH_TOKEN` Worker secret, and run:
+For a live integration check, use a dedicated test deployment with Turnstile configured, set the
+optional `AI_HEALTH_TOKEN` Worker secret, and run:
 
 ```bash
 SMOKE_BASE_URL=https://<name>.<subdomain>.workers.dev \
@@ -192,13 +192,15 @@ bunx wrangler secret put AI_HEALTH_TOKEN
 If SMS handoff is intentionally simulated, skip the `CONTACT_SMS_TO_NUMBER` and Twilio secrets. If
 Turnstile is disabled, skip `TURNSTILE_SECRET_KEY`.
 
-## Turnstile (optional bot protection)
+## Turnstile (required for production)
 
-Disabled by default (`REQUIRE_TURNSTILE: "false"`). To enable it:
+Production requires Turnstile by default (`REQUIRE_TURNSTILE: "true"`). Configure it before
+exposing the AI endpoints:
 
 1. Create a Turnstile widget in Cloudflare and note its site key and secret key.
-2. Set `REQUIRE_TURNSTILE: "true"` in `wrangler.jsonc`.
-3. Set the `TURNSTILE_SECRET_KEY` secret.
+2. Keep `REQUIRE_TURNSTILE: "true"` in `wrangler.jsonc` for production. The gitignored local
+   `.dev.vars` example disables it only for local testing.
+3. Set the `TURNSTILE_SECRET_KEY` Worker secret before enabling public AI traffic.
 4. Provide your production `VITE_TURNSTILE_SITE_KEY` in the shell/CI or `.env.local` so `bun run build`
    bakes it into the bundle. `predeploy:validate` requires this value to be present when
    `REQUIRE_TURNSTILE=true` (it checks presence, not whether the key is real), so make sure it is your
