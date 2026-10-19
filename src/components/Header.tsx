@@ -1,7 +1,8 @@
+import { EmailButton } from '@/components/EmailButton'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { RESUME_PDF_PATH, resumeViewModel } from '@/data/resume'
-import { FileText, Linkedin, Mail } from 'lucide-react'
+import { FileText, Linkedin } from 'lucide-react'
 
 export function Header() {
   const {
@@ -116,15 +117,13 @@ export function Header() {
                   <Linkedin className="w-4 h-4" />
                 </a>
               </Button>
-              <Button asChild variant="ghost" size="icon">
-                <a
-                  href={`mailto:${contact.email}`}
-                  aria-label="Send email"
-                  title={`Email ${firstName}`}
-                >
-                  <Mail className="w-4 h-4" />
-                </a>
-              </Button>
+              <EmailButton
+                email={contact.email}
+                label={`Email ${firstName}`}
+                iconOnly
+                variant="ghost"
+                size="icon"
+              />
             </div>
             <ThemeToggle className="relative top-0 right-0 shrink-0" />
           </div>

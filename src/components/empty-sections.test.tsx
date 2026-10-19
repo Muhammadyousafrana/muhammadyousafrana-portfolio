@@ -31,7 +31,12 @@ const emptyViewModel = {
 }
 
 const leadershipItem = { title: 'Frontend Guild Lead', organization: 'Acme', period: '2020' }
-const certItem = { title: 'AWS Certified', organization: 'Amazon', period: '2021' }
+const certItem = {
+  title: 'AWS Certified',
+  organization: 'Amazon',
+  period: '2021',
+  url: 'https://example.com/certificate',
+}
 const awardItem = { title: 'Engineering Award', detail: 'For excellence', period: '2022' }
 const expItem = {
   id: 'exp-1',
@@ -40,6 +45,7 @@ const expItem = {
   period: '2020 - Present',
   summary: 'Owned core services.',
   bullets: ['Shipped the platform.'],
+  links: [],
 }
 const projItem = {
   id: 'proj-1',
@@ -48,6 +54,12 @@ const projItem = {
   period: '2021',
   summary: 'A toolkit.',
   bullets: ['Built adapters.'],
+  links: [],
+}
+const linkedUndatedProject = {
+  ...projItem,
+  period: undefined,
+  links: [{ label: 'GitHub', url: 'https://github.com/example/project' }],
 }
 
 function useViewModel(overrides: Record<string, unknown>) {
@@ -86,6 +98,8 @@ describe('CredentialHighlights empty-state hiding', () => {
     expect(markup).toContain('Certification')
     expect(markup).toContain('Award')
     expect(markup).toContain(certItem.title)
+    expect(markup).toContain(`href="${certItem.url}"`)
+    expect(markup).toContain('Verify credential')
     expect(markup).toContain(awardItem.title)
   })
 })
@@ -127,6 +141,15 @@ describe('ExperienceFeed empty-state hiding', () => {
     expect(markup).toContain('id="projects"')
     expect(markup).not.toContain('Professional Experience')
     expect(markup).not.toContain('id="experience"')
+  })
+
+  it('links project titles and omits absent dates', () => {
+    useViewModel({ projects: [linkedUndatedProject] })
+    const markup = renderToStaticMarkup(<ExperienceFeed />)
+    expect(markup).toContain(`href="${linkedUndatedProject.links[0].url}"`)
+    expect(markup).toContain('target="_blank"')
+    expect(markup).toContain('GitHub')
+    expect(markup).not.toContain('date-pill')
   })
 
   it('renders both blocks with both anchors when populated', () => {

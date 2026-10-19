@@ -4,14 +4,14 @@ import { resumeContact, resumeData } from './resume-canonical'
 function createPromptEvidenceItem(
   title: string,
   organization: string,
-  period: string,
+  period: string | undefined,
   summary: string,
   bullets: readonly string[]
 ) {
   return {
     title,
     organization,
-    period,
+    ...(period ? { period } : {}),
     summary,
     evidence: bullets,
   }
@@ -40,25 +40,25 @@ function createResumePromptPayload() {
     ),
     projectEvidence: resumeData.projects.map((item) => ({
       name: item.name,
-      period: item.period,
+      ...(item.period ? { period: item.period } : {}),
       summary: item.description,
       evidence: item.bullets,
     })),
     leadershipEvidence: resumeData.leadership.map((item) => ({
       title: item.role,
       organization: item.organization,
-      period: item.period,
+      ...(item.period ? { period: item.period } : {}),
       evidence: item.highlights,
     })),
     certificationEvidence: resumeData.certifications.map((item) => ({
       title: item.name,
       issuer: item.issuer,
-      period: item.period,
+      ...(item.period ? { period: item.period } : {}),
       evidence: item.highlights,
     })),
     awards: resumeData.awards.map((item) => ({
       title: item.name,
-      period: item.period,
+      ...(item.period ? { period: item.period } : {}),
       detail: item.detail,
     })),
     skillsSnapshot: {

@@ -3,11 +3,13 @@
 # These are placeholders only.
 
 # --- Required: AI chat + fit-analysis ---
-# Provider switch. workers-ai uses the Worker AI binding; google-gateway keeps
-# the native Google path through AI Gateway.
-AI_PROVIDER=workers-ai
+# Google AI Studio is the simplest free local test provider. Create a key at
+# https://aistudio.google.com/api-keys and keep it server-side in this file.
+AI_PROVIDER=google-ai-studio
+GOOGLE_GENERATIVE_AI_API_KEY=replace-with-your-google-ai-studio-key
+# Or set AI_PROVIDER=workers-ai / google-gateway to use the Cloudflare AI Gateway.
 # AI Gateway locator (compat-shaped URL). Replace the REPLACE_WITH_* segments with
-# your Cloudflare account id and AI Gateway slug. Both providers use its gateway id.
+# your Cloudflare account id and AI Gateway slug. Gateway-backed providers need it.
 CF_AI_BASE_URL=https://gateway.ai.cloudflare.com/v1/REPLACE_WITH_ACCOUNT_ID/REPLACE_WITH_GATEWAY_SLUG/compat
 # Required only for AI_PROVIDER=google-gateway: Authenticated Gateway token.
 #CF_AI_GATEWAY_TOKEN=your-ai-gateway-token

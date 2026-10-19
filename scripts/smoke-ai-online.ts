@@ -16,7 +16,9 @@ if (!baseUrl || !healthToken) {
 
 const provider = parseAiProvider(process.env.AI_PROVIDER)
 if (!provider || !process.env.AI_PROVIDER?.trim()) {
-  console.error('[smoke:ai:online] Set AI_PROVIDER to workers-ai or google-gateway.')
+  console.error(
+    '[smoke:ai:online] Set AI_PROVIDER to workers-ai, google-gateway, or google-ai-studio.'
+  )
   process.exit(2)
 }
 

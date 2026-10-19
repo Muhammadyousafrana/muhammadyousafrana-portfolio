@@ -1,13 +1,15 @@
 import { CredentialHighlights } from '@/components/CredentialHighlights'
+import { EmailButton } from '@/components/EmailButton'
 import { ExperienceFeed } from '@/components/ExperienceFeed'
 import { FitAssessment } from '@/components/FitAssessment'
 import { Header } from '@/components/Header'
+import { ProfileLinks } from '@/components/ProfileLinks'
 import { ResumeChat } from '@/components/ResumeChat'
 import { SkillsMatrix } from '@/components/SkillsMatrix'
 import { Button } from '@/components/ui/button'
 import { resumeViewModel } from '@/data/resume'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Bot, Briefcase, CheckCircle2, Cpu, Linkedin, Mail, MapPin, Target } from 'lucide-react'
+import { Bot, Briefcase, CheckCircle2, Cpu, Linkedin, MapPin, Target } from 'lucide-react'
 
 export function HomePage() {
   const prefersReducedMotion = useReducedMotion()
@@ -81,16 +83,12 @@ export function HomePage() {
                   hasExperience ? 'md:grid-cols-3' : 'md:grid-cols-2'
                 }`}
               >
-                <Button
-                  asChild
+                <EmailButton
+                  email={contact.email}
+                  label={`Email ${firstName} directly`}
                   size="lg"
                   className="w-full rounded-full px-6 h-12 btn-gradient shadow-xl hover:shadow-blue-500/25 text-sm font-semibold !text-white hover:!text-white"
-                >
-                  <a href={`mailto:${contact.email}`}>
-                    <Mail className="w-4 h-4 mr-2" />
-                    Email {firstName} Directly
-                  </a>
-                </Button>
+                />
                 <Button
                   asChild
                   size="sm"
@@ -132,6 +130,11 @@ export function HomePage() {
                 <div className={spotlightPrimaryGlowClassName} />
                 <div className={spotlightSecondaryGlowClassName} />
                 <div className="relative z-10 space-y-4">
+                  <img
+                    src="/profile.png"
+                    alt="Portrait of Muhammad Yousaf Rana"
+                    className="mx-auto size-32 rounded-full border-4 border-white/20 object-cover object-center shadow-xl"
+                  />
                   <h2 className="text-xl md:text-2xl font-bold tracking-tight">At a glance</h2>
                   <ul className="space-y-3.5">
                     {homepage.proofPoints.map((proof) => (
@@ -180,16 +183,12 @@ export function HomePage() {
                   {homepage.ctaSubtext}
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
-                  <Button
-                    asChild
+                  <EmailButton
+                    email={contact.email}
+                    label={`Email ${firstName}`}
                     size="lg"
                     className="w-full sm:w-auto bg-white text-blue-950 hover:bg-blue-100 hover:text-blue-900 hover:shadow-lg hover:shadow-blue-950/20 rounded-full px-10 h-14 text-base font-semibold transition-all"
-                  >
-                    <a href={`mailto:${contact.email}`}>
-                      <Mail className="w-5 h-5 mr-2" />
-                      Email {firstName}
-                    </a>
-                  </Button>
+                  />
                   <Button
                     asChild
                     size="lg"
@@ -223,6 +222,9 @@ export function HomePage() {
             <span>AI Usage Note: Requests are subject to server limits</span>
           </div>
         </div>
+        <ProfileLinks
+          profiles={[{ label: 'LinkedIn', url: contact.linkedinUrl }, ...contact.profiles]}
+        />
       </footer>
       <ResumeChat />
     </div>

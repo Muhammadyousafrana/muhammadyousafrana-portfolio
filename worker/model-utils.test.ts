@@ -104,6 +104,20 @@ describe('resolveModelRuntime', () => {
     expect(runtime?.provider).toBe('google-gateway')
   })
 
+  it('builds a direct Google AI Studio runtime without Cloudflare Gateway settings', () => {
+    const runtime = resolveModelRuntime({
+      AI_PROVIDER: 'google-ai-studio',
+      GOOGLE_GENERATIVE_AI_API_KEY: GATEWAY_API_KEY,
+    })
+
+    expect(runtime?.provider).toBe('google-ai-studio')
+    expect(
+      resolveModelRuntime({
+        AI_PROVIDER: 'google-ai-studio',
+      })
+    ).toBeUndefined()
+  })
+
   it('rejects unknown provider values', () => {
     expect(
       resolveModelRuntime({
@@ -258,6 +272,77 @@ describe('gateway model helpers', () => {
           },
         },
       ])
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+})
+
+describe('Google AI Studio model helpers', () => {
+  const getProvider = () => {
+    const provider = resolveModelRuntime({
+      AI_PROVIDER: 'google-ai-studio',
+      GOOGLE_GENERATIVE_AI_API_KEY: GATEWAY_API_KEY,
+    })
+    if (!provider || provider.provider !== 'google-ai-studio') {
+      throw new Error('Expected Google AI Studio runtime')
+    }
+    return provider
+  }
+
+  it('sends native Gemini chat requests directly with the key in a server-side header', async () => {
+    const originalFetch = globalThis.fetch
+    let requestUrl = ''
+    let requestHeaders: Headers | undefined
+
+    globalThis.fetch = (async (input, init) => {
+      requestUrl = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      requestHeaders = new Headers(init?.headers)
+      return createGoogleGenerateContentResponse('ok')
+    }) as typeof fetch
+
+    try {
+      const result = await generateText({
+        model: createTextModel(getProvider(), 'gemini-3.5-flash-lite'),
+        prompt: 'Say ok',
+        maxRetries: 0,
+      })
+
+      expect(result.text).toBe('ok')
+      expect(requestUrl).toBe(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent'
+      )
+      expect(requestHeaders?.get('x-goog-api-key')).toBe(GATEWAY_API_KEY)
+      expect(requestUrl).not.toContain(GATEWAY_API_KEY)
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+  })
+
+  it('supports schema-constrained fit output through Google native structured generation', async () => {
+    const originalFetch = globalThis.fetch
+    let requestBody = ''
+
+    globalThis.fetch = (async (_input, init) => {
+      requestBody = typeof init?.body === 'string' ? init.body : ''
+      return createGoogleGenerateContentResponse('{"ok":true}')
+    }) as typeof fetch
+
+    try {
+      const result = await generateText({
+        model: createStructuredModel(getProvider(), 'gemini-3.5-flash-lite'),
+        prompt: 'Return ok',
+        maxRetries: 0,
+        output: Output.object({
+          schema: z.object({ ok: z.boolean() }),
+          name: 'test_object',
+        }),
+      })
+
+      expect(result.output).toEqual({ ok: true })
+      expect(JSON.parse(requestBody)).toMatchObject({
+        generationConfig: { responseMimeType: 'application/json' },
+      })
     } finally {
       globalThis.fetch = originalFetch
     }

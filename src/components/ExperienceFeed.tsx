@@ -6,6 +6,8 @@ interface ExperienceItemProps {
 }
 
 function ExperienceItem({ item }: ExperienceItemProps) {
+  const primaryProjectLink = item.organization === 'Featured Project' ? item.links[0] : undefined
+
   return (
     <div className="relative pl-8 md:pl-9 border-l-2 border-slate-200 dark:border-slate-800 pb-12 md:pb-14 last:pb-0">
       <div
@@ -14,8 +16,21 @@ function ExperienceItem({ item }: ExperienceItemProps) {
       />
       <div className="space-y-[18px]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
-          <h3 className="text-xl font-bold tracking-tight">{item.title}</h3>
-          <span className="date-pill w-fit">{item.period}</span>
+          <h3 className="text-xl font-bold tracking-tight">
+            {primaryProjectLink ? (
+              <a
+                href={primaryProjectLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                {item.title}
+              </a>
+            ) : (
+              item.title
+            )}
+          </h3>
+          {item.period && <span className="date-pill w-fit">{item.period}</span>}
         </div>
 
         <p className="meta-label text-blue-700 dark:text-blue-300">{item.organization}</p>
@@ -31,6 +46,24 @@ function ExperienceItem({ item }: ExperienceItemProps) {
             </li>
           ))}
         </ul>
+        {item.links.length > 0 && (
+          <div className="flex flex-wrap gap-2" aria-label={`${item.title} links`}>
+            {item.links.map((link) => (
+              <a
+                key={`${item.id}-${link.label}`}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-full border border-blue-200 dark:border-blue-800 px-3 py-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 transition-colors hover:bg-blue-50 dark:hover:bg-blue-950/40"
+              >
+                {link.label}{' '}
+                <span aria-hidden="true" className="ml-1">
+                  ↗
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

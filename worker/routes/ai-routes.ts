@@ -277,7 +277,8 @@ let cachedAiHealth: AiHealthSnapshot | null = null
 
 // Probe the same ordered model chain production traffic uses, not just the
 // primary. Workers attempts are app-side so the health response can name the
-// actual winner; Google retains Gateway-side fallback.
+// actual winner; Google Gateway uses gateway-side chat fallback, while direct
+// AI Studio intentionally selects one model for the free local test profile.
 const probeAiHealth = async (
   runtime: ModelRuntime
 ): Promise<{ latencyMs: number; model: string }> => {

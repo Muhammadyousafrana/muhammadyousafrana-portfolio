@@ -22,36 +22,44 @@ type EvidenceItem = {
   id: string
   company: string
   role: string
-  period: string
+  period?: string
   description: string
   bullets: readonly string[]
+  links: readonly { label: string; url: string }[]
 }
 type ProjectItem = {
   id: string
   name: string
-  period: string
+  period?: string
   description: string
   bullets: readonly string[]
+  links: readonly { label: string; url: string }[]
 }
 type LeadershipItem = {
   organization: string
   role: string
-  period: string
+  period?: string
   highlights: readonly string[]
 }
 type CertificationItem = {
   name: string
   issuer: string
-  period: string
+  period?: string
+  url?: string
   highlights: readonly string[]
 }
-type AwardItem = { name: string; period: string; detail: string }
+type AwardItem = { name: string; period?: string; detail: string }
 type HomePageProofPoint = { sourceId: EvidenceId; title: string; detail: string }
 
 type ResumeData = {
   name: string
   title: string
-  contact: { email: string; location: string; linkedinPath: string }
+  contact: {
+    email: string
+    location: string
+    linkedinPath: string
+    profiles: readonly { label: string; url: string }[]
+  }
   summary: string
   targetRoles: readonly string[]
   education: readonly EducationItem[]
@@ -88,6 +96,7 @@ export const resumeContact = {
   email: resumeData.contact.email,
   location: resumeData.contact.location,
   linkedinUrl: `https://${linkedinPath}`,
+  profiles: [...resumeData.contact.profiles],
 }
 
 // Owner-facing identity strings consumed by the AI prompts, the worker SMS body,
@@ -130,9 +139,10 @@ const createFeedItem = (
   id: string,
   title: string,
   organization: string,
-  period: string,
+  period: string | undefined,
   summary: string,
-  bullets: readonly string[]
+  bullets: readonly string[],
+  links: readonly { label: string; url: string }[] = []
 ) => ({
   id,
   title,
@@ -140,6 +150,7 @@ const createFeedItem = (
   period,
   summary,
   bullets: [...bullets],
+  links: [...links],
 })
 
 export const resumeViewModel = {
@@ -156,7 +167,15 @@ export const resumeViewModel = {
     degree: resumeData.education[0].degree,
   },
   experience: resumeData.experience.map((item) =>
-    createFeedItem(item.id, item.role, item.company, item.period, item.description, item.bullets)
+    createFeedItem(
+      item.id,
+      item.role,
+      item.company,
+      item.period,
+      item.description,
+      item.bullets,
+      item.links
+    )
   ),
   projects: resumeData.projects.map((item) =>
     createFeedItem(
@@ -165,7 +184,8 @@ export const resumeViewModel = {
       'Featured Project',
       item.period,
       item.description,
-      item.bullets
+      item.bullets,
+      item.links
     )
   ),
   leadership: resumeData.leadership.map((item) => ({
@@ -177,6 +197,7 @@ export const resumeViewModel = {
     title: item.name,
     organization: item.issuer,
     period: item.period,
+    url: item.url,
   })),
   awards: resumeData.awards.map((item) => ({
     title: item.name,

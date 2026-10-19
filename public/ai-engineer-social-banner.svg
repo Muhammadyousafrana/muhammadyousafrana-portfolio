@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <title>Muhammad Yousaf Rana — AI Engineer</title>
+  <desc>Portfolio banner for multimodal AI, MLOps, and edge inference.</desc>
+  <defs>
+    <linearGradient id="background" x1="72" y1="42" x2="1128" y2="608" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#080D1B"/>
+      <stop offset="1" stop-color="#112644"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="84" y1="0" x2="876" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67E8F9"/>
+      <stop offset=".5" stop-color="#60A5FA"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="matrix(0 320 -360 0 1000 320)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#2563EB" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" stroke="#C7D2FE" stroke-opacity=".07"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" rx="32" fill="url(#background)"/>
+  <rect width="1200" height="630" rx="32" fill="url(#grid)"/>
+  <rect width="1200" height="630" rx="32" fill="url(#glow)"/>
+  <path d="M690 168 836 104l116 84 118-42M690 168l52 143 152-123M742 311l-64 145 135 72 115-115M894 188l50 140 126-182M894 188l-1 225 170-87M813 528l80-115 166 15M678 456l-94-74 106-214M1064 46l50 100-8 168M742 311l202 17 119 161" stroke="url(#accent)" stroke-opacity=".54" stroke-width="2"/>
+  <g fill="#0B1428" stroke="url(#accent)" stroke-width="3">
+    <circle cx="690" cy="168" r="12"/>
+    <circle cx="836" cy="104" r="9"/>
+    <circle cx="952" cy="188" r="13"/>
+    <circle cx="1069" cy="146" r="9"/>
+    <circle cx="742" cy="311" r="13"/>
+    <circle cx="894" cy="188" r="17"/>
+    <circle cx="944" cy="328" r="12"/>
+    <circle cx="1064" cy="146" r="8"/>
+    <circle cx="1064" cy="326" r="13"/>
+    <circle cx="678" cy="456" r="10"/>
+    <circle cx="813" cy="528" r="12"/>
+    <circle cx="893" cy="413" r="14"/>
+    <circle cx="1059" cy="428" r="10"/>
+  </g>
+  <circle cx="894" cy="188" r="42" fill="#60A5FA" fill-opacity=".12"/>
+  <circle cx="894" cy="188" r="27" stroke="#A5F3FC" stroke-opacity=".7"/>
+  <path d="M879 190c5-10 10-10 15 0s10 10 15 0M885 180v20m9-25v30m9-25v20" stroke="#CFFAFE" stroke-width="2" stroke-linecap="round"/>
+  <rect x="82" y="92" width="205" height="38" rx="19" fill="#142640" stroke="#365274"/>
+  <circle cx="103" cy="111" r="5" fill="#67E8F9"/>
+  <text x="119" y="116" fill="#B6D4F5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="2">AI ENGINEERING</text>
+  <text x="82" y="235" fill="#F8FAFC" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="48" font-weight="700" letter-spacing="-1.6">Muhammad Yousaf Rana</text>
+  <text x="82" y="302" fill="url(#accent)" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="56" font-weight="700" letter-spacing="-1.8">AI Engineer</text>
+  <text x="84" y="360" fill="#D3DEEE" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="400">Multimodal systems · MLOps · Edge inference</text>
+  <path d="M84 408h390" stroke="url(#accent)" stroke-opacity=".72" stroke-width="2"/>
+  <text x="84" y="452" fill="#9FB3CC" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" font-weight="600" letter-spacing="1.8">COMPUTER VISION  /  AUDIO ML  /  ON-DEVICE AI</text>
+  <text x="84" y="568" fill="#7187A3" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="500">Portfolio · Islamabad, Pakistan</text>
+</svg>

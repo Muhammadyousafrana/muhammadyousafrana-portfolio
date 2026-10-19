@@ -68,7 +68,8 @@ tools [`worker/chat-tools.ts`](../worker/chat-tools.ts) +
 
 **AI transport.** `AI_PROVIDER` selects a provider profile without changing routes. `workers-ai`
 uses the Worker `AI` binding with Gemma primary and GLM fallback; `google-gateway` preserves the
-native Google/compat split. Both use `CF_AI_BASE_URL` as the Cloudflare AI Gateway locator. _Canonical:
+native Google/compat split through Cloudflare; `google-ai-studio` uses the native Google SDK and a
+server-side API key directly. Only the Gateway-backed profiles use `CF_AI_BASE_URL`. _Canonical:
 [`worker/model-utils.ts`](../worker/model-utils.ts), [`shared/models.ts`](../shared/models.ts). Model
 policy: [`ai-model-strategy.md`](./ai-model-strategy.md)._
 

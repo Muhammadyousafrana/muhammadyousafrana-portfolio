@@ -1,9 +1,13 @@
 import {
+  createGoogleGenerativeAI as createAiStudioGoogleGenerativeAI,
+  type GoogleGenerativeAIProvider,
+} from '@ai-sdk/google'
+import {
   AiGatewayUnauthorizedError,
   createAiGateway,
   type AiGatewayAPISettings,
 } from 'ai-gateway-provider'
-import { createGoogleGenerativeAI } from 'ai-gateway-provider/providers/google'
+import { createGoogleGenerativeAI as createGatewayGoogleGenerativeAI } from 'ai-gateway-provider/providers/google'
 import { createUnified } from 'ai-gateway-provider/providers/unified'
 import { createClientFallbackModel, createWorkersAI, type WorkersAI } from 'workers-ai-provider'
 import { getModelIds, parseAiProvider, type ModelCandidates } from '../shared/models'
@@ -63,13 +67,19 @@ export interface GoogleGatewayRuntime {
   gateway: ReturnType<typeof createAiGateway>
 }
 
+export interface GoogleAiStudioRuntime {
+  provider: 'google-ai-studio'
+  candidates: ModelCandidates
+  google: GoogleGenerativeAIProvider
+}
+
 export interface WorkersAiRuntime {
   provider: 'workers-ai'
   candidates: ModelCandidates
   workersAI: WorkersAI
 }
 
-export type ModelRuntime = GoogleGatewayRuntime | WorkersAiRuntime
+export type ModelRuntime = GoogleGatewayRuntime | GoogleAiStudioRuntime | WorkersAiRuntime
 
 export type GatewayChatStructuredModelOptions = Pick<
   UnifiedProviderOptions,
@@ -219,11 +229,13 @@ export const resolveModelRuntime = ({
   AI_PROVIDER,
   CF_AI_GATEWAY_TOKEN,
   CF_AI_BASE_URL,
+  GOOGLE_GENERATIVE_AI_API_KEY,
 }: {
   AI?: Ai
   AI_PROVIDER?: string
   CF_AI_GATEWAY_TOKEN?: string
   CF_AI_BASE_URL?: string
+  GOOGLE_GENERATIVE_AI_API_KEY?: string
 }): ModelRuntime | undefined => {
   const provider = parseAiProvider(AI_PROVIDER)
   if (!provider) return undefined
@@ -233,6 +245,17 @@ export const resolveModelRuntime = ({
       apiKey: CF_AI_GATEWAY_TOKEN?.trim(),
       baseURL: CF_AI_BASE_URL?.trim(),
     })
+  }
+
+  if (provider === 'google-ai-studio') {
+    const apiKey = GOOGLE_GENERATIVE_AI_API_KEY?.trim()
+    if (!apiKey) return undefined
+
+    return {
+      provider,
+      candidates: getModelIds(provider),
+      google: createAiStudioGoogleGenerativeAI({ apiKey }),
+    }
   }
 
   const settings = resolveAiGatewayApiSettings({ baseURL: CF_AI_BASE_URL?.trim() })
@@ -255,7 +278,7 @@ export const resolveModelRuntime = ({
 // Registry ids stay gateway-prefixed (`google-ai-studio/...`, the gateway
 // provider slug); the native provider addresses bare ids under /models/<id>,
 // so the prefix is stripped here and only here.
-const google = createGoogleGenerativeAI()
+const google = createGatewayGoogleGenerativeAI()
 const GOOGLE_GATEWAY_MODEL_PREFIX = 'google-ai-studio/'
 
 const toNativeGoogleModel = (modelId: string) =>
@@ -267,6 +290,10 @@ const toNativeGoogleModel = (modelId: string) =>
 
 export const createTextModel = (runtime: ModelRuntime, model: string | readonly string[]) => {
   const models = typeof model === 'string' ? [model] : [...model]
+  if (runtime.provider === 'google-ai-studio') {
+    return runtime.google.chat(models[0])
+  }
+
   if (runtime.provider === 'workers-ai') {
     const workersModels = models.map((modelId) => ({
       slug: modelId,
@@ -292,6 +319,10 @@ export const createStructuredModel = (
   model: string,
   options: GatewayChatStructuredModelOptions = {}
 ) => {
+  if (runtime.provider === 'google-ai-studio') {
+    return runtime.google.chat(model)
+  }
+
   if (runtime.provider === 'workers-ai') {
     return runtime.workersAI(model as Parameters<WorkersAI>[0])
   }

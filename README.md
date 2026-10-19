@@ -130,8 +130,9 @@ commit secrets. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for the full "what lives wh
 | Variable                                                                                 | Required?                        | Where                                        |
 | ---------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------- |
 | `AI_PROVIDER`                                                                            | Required                         | `wrangler.jsonc` var; `.dev.vars` locally.   |
-| `CF_AI_BASE_URL`                                                                         | Required                         | `wrangler.jsonc` var; `.dev.vars` locally.   |
-| `CF_AI_GATEWAY_TOKEN`                                                                    | Google provider only             | Secret / `.dev.vars` (AI Gateway token).     |
+| `CF_AI_BASE_URL`                                                                         | Gateway providers only           | `wrangler.jsonc` var; `.dev.vars` locally.   |
+| `GOOGLE_GENERATIVE_AI_API_KEY`                                                           | Direct Google only               | Secret / `.dev.vars`; keep server-side.      |
+| `CF_AI_GATEWAY_TOKEN`                                                                    | Google Gateway only              | Secret / `.dev.vars` (AI Gateway token).     |
 | `SECURITY_HMAC_SECRET`                                                                   | Required                         | Secret / `.dev.vars` (signs tenant cookies). |
 | `REQUIRE_TURNSTILE`                                                                      | Required var (`"false"` default) | `wrangler.jsonc` var.                        |
 | `VITE_TURNSTILE_SITE_KEY`                                                                | If Turnstile enabled             | Build-time env (`.env.local` / shell).       |
@@ -140,10 +141,11 @@ commit secrets. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for the full "what lives wh
 | `AI_HEALTH_TOKEN`                                                                        | Optional                         | Secret; gates `GET /api/health/ai` if set.   |
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`                                          | Optional (deploy auth)           | Shell / CI (not runtime bindings).           |
 
-`AI_PROVIDER` selects `workers-ai` (Gemma 4 with GLM-4.7-Flash fallback through the `AI` binding) or
-`google-gateway` (the native Gemini path). Provider-specific model chains live in
-`shared/models.ts`; routes do not change when switching. `CF_AI_BASE_URL` is the Gateway locator
-both paths use. Keep its `/compat` suffix. `CF_AI_GATEWAY_TOKEN` is required only for Google.
+`AI_PROVIDER` selects `workers-ai` (through the `AI` binding), `google-gateway` (Gemini through
+Cloudflare AI Gateway), or `google-ai-studio` (direct Gemini API). The local example defaults to
+`google-ai-studio`; its API key stays in gitignored `.dev.vars`. Provider model chains live in
+`shared/models.ts`; routes do not change when switching. `CF_AI_BASE_URL` is needed only by the two
+Gateway-backed profiles. `CF_AI_GATEWAY_TOKEN` is only for `google-gateway`.
 
 For Google BYOK, create a [Google AI Studio key](https://aistudio.google.com/api-keys), then store it
 in Cloudflare under **AI > AI Gateway > select the gateway > Provider Keys > Add API Key > Google AI
@@ -153,7 +155,7 @@ Authenticated Gateway token. See [DEPLOYMENT.md](DEPLOYMENT.md#ai-gateway-setup)
 ## API surface
 
 - `GET /api/health` - basic liveness.
-- `GET /api/health/ai` - AI gateway health probe (optionally bearer-gated by `AI_HEALTH_TOKEN`).
+- `GET /api/health/ai` - selected AI provider health probe (optionally bearer-gated by `AI_HEALTH_TOKEN`).
 - `GET /api/chat/bootstrap` - challenge/turnstile state for the client.
 - `POST /api/chat/verify-turnstile` - exchange a solved Turnstile token for a signed lease.
 - `POST /api/chat` - streaming chat turn.

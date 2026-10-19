@@ -41,17 +41,19 @@ const evidenceItemSchema = z.strictObject({
   id: nonEmpty,
   company: nonEmpty,
   role: nonEmpty,
-  period: nonEmpty,
+  period: nonEmpty.optional(),
   description: nonEmpty,
   bullets: z.array(nonEmpty).min(1),
+  links: z.array(z.strictObject({ label: nonEmpty, url: z.url() })).default([]),
 })
 
 const projectSchema = z.strictObject({
   id: nonEmpty,
   name: nonEmpty,
-  period: nonEmpty,
+  period: nonEmpty.optional(),
   description: nonEmpty,
   bullets: z.array(nonEmpty).min(1),
+  links: z.array(z.strictObject({ label: nonEmpty, url: z.url() })).default([]),
 })
 
 const proofPointSchema = z.strictObject({
@@ -71,6 +73,7 @@ const portfolioSchema = z
       email: nonEmpty,
       location: nonEmpty,
       linkedinPath: nonEmpty,
+      profiles: z.array(z.strictObject({ label: nonEmpty, url: z.url() })).default([]),
     }),
     seo: z.strictObject({
       title: nonEmpty,
@@ -100,7 +103,7 @@ const portfolioSchema = z
         z.strictObject({
           organization: nonEmpty,
           role: nonEmpty,
-          period: nonEmpty,
+          period: nonEmpty.optional(),
           highlights: z.array(nonEmpty).default([]),
         })
       )
@@ -110,7 +113,8 @@ const portfolioSchema = z
         z.strictObject({
           name: nonEmpty,
           issuer: nonEmpty,
-          period: nonEmpty,
+          period: nonEmpty.optional(),
+          url: z.url().optional(),
           highlights: z.array(nonEmpty).default([]),
         })
       )
@@ -119,7 +123,7 @@ const portfolioSchema = z
       .array(
         z.strictObject({
           name: nonEmpty,
-          period: nonEmpty,
+          period: nonEmpty.optional(),
           detail: nonEmpty,
         })
       )

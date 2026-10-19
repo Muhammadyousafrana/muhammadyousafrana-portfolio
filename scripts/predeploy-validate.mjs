@@ -14,17 +14,16 @@ import { loadEnv } from 'vite'
 import { AI_PROVIDER_IDS } from '../shared/models.ts'
 
 // The wrangler.jsonc placeholder that must be replaced with a real account id +
-// gateway slug before the Worker can talk to the AI Gateway.
+// gateway slug when an AI Gateway-backed provider is selected.
 const CF_AI_BASE_URL_SENTINEL = 'REPLACE_WITH_'
 // The compat locator shape the runtime hard-requires (see resolveAiGatewayApiSettings
 // in worker/model-utils.ts): /v1/<account-id>/<gateway-slug>/compat.
 const CF_AI_BASE_URL_API_VERSION = 'v1'
 const CF_AI_BASE_URL_TRANSPORT = 'compat'
-const [AI_PROVIDER_WORKERS, AI_PROVIDER_GOOGLE] = AI_PROVIDER_IDS
+const [AI_PROVIDER_WORKERS, AI_PROVIDER_GOOGLE_GATEWAY, AI_PROVIDER_GOOGLE_STUDIO] = AI_PROVIDER_IDS
 
 const REQUIRED_VAR_NAMES = [
   'AI_PROVIDER',
-  'CF_AI_BASE_URL',
   'SESSION_COOKIE_NAME',
   'SESSION_COOKIE_MAX_AGE_SECONDS',
   'RATE_LIMIT_WINDOW_SECONDS',
@@ -167,8 +166,12 @@ function main() {
     failures.push('AI_PROVIDER=workers-ai requires the top-level AI binding named "AI"')
   }
 
+  const usesAiGateway =
+    aiProvider === AI_PROVIDER_WORKERS || aiProvider === AI_PROVIDER_GOOGLE_GATEWAY
   const cfAiBaseUrl = String(vars.CF_AI_BASE_URL ?? '').trim()
-  if (cfAiBaseUrl.includes(CF_AI_BASE_URL_SENTINEL)) {
+  if (usesAiGateway && !hasValue(cfAiBaseUrl)) {
+    failures.push('CF_AI_BASE_URL is required for AI Gateway-backed providers')
+  } else if (usesAiGateway && cfAiBaseUrl.includes(CF_AI_BASE_URL_SENTINEL)) {
     failures.push(
       `CF_AI_BASE_URL still contains the "${CF_AI_BASE_URL_SENTINEL}" placeholder. Replace it with your real Cloudflare AI Gateway locator (account id + gateway slug) before deploying.`
     )
@@ -183,7 +186,8 @@ function main() {
   const requireTurnstile = isTruthyFlag(vars.REQUIRE_TURNSTILE)
   const requiredSecretNames = [
     ...REQUIRED_SECRET_NAMES,
-    ...(aiProvider === AI_PROVIDER_GOOGLE ? ['CF_AI_GATEWAY_TOKEN'] : []),
+    ...(aiProvider === AI_PROVIDER_GOOGLE_GATEWAY ? ['CF_AI_GATEWAY_TOKEN'] : []),
+    ...(aiProvider === AI_PROVIDER_GOOGLE_STUDIO ? ['GOOGLE_GENERATIVE_AI_API_KEY'] : []),
     ...(requireTurnstile ? [TURNSTILE_SECRET_NAME] : []),
   ]
 

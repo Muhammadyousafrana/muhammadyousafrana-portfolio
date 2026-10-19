@@ -4,8 +4,9 @@ import { Award, BadgeCheck, Users } from 'lucide-react'
 
 export function CredentialHighlights() {
   const leadership = resumeViewModel.leadership.slice(0, 2)
-  const certifications = resumeViewModel.certifications.slice(0, 1)
+  const certifications = resumeViewModel.certifications
   const awards = resumeViewModel.awards.slice(0, 1)
+  const certificationsOnly = leadership.length === 0 && awards.length === 0
 
   // Nothing to show: hide the whole section (heading included) rather than render
   // an empty shell. Individual cards below hide the same way when their list is empty.
@@ -36,7 +37,7 @@ export function CredentialHighlights() {
                 <article key={`${item.organization}-${item.title}`} className="space-y-1.5">
                   <p className="font-semibold">{item.title}</p>
                   <p className="text-muted-foreground">{item.organization}</p>
-                  <p className="date-pill w-fit">{item.period}</p>
+                  {item.period && <p className="date-pill w-fit">{item.period}</p>}
                 </article>
               ))}
             </CardContent>
@@ -44,19 +45,39 @@ export function CredentialHighlights() {
         )}
 
         {certifications.length > 0 && (
-          <Card className="border-2 border-indigo-200/70 dark:border-indigo-700/50 bg-indigo-50/35 dark:bg-indigo-900/20 h-full">
+          <Card
+            className={`border-2 border-indigo-200/70 dark:border-indigo-700/50 bg-indigo-50/35 dark:bg-indigo-900/20 h-full ${certificationsOnly ? 'md:col-span-3' : ''}`}
+          >
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 text-base">
                 <BadgeCheck className="w-4 h-4" />
                 Certification
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm">
+            <CardContent
+              className={
+                certificationsOnly
+                  ? 'grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3'
+                  : 'space-y-4 text-sm'
+              }
+            >
               {certifications.map((item) => (
-                <article key={item.title} className="space-y-1.5">
+                <article
+                  key={item.title}
+                  className={`space-y-1.5 ${certificationsOnly ? 'rounded-xl border border-indigo-200/70 p-4 dark:border-indigo-800/70' : ''}`}
+                >
                   <p className="font-semibold">{item.title}</p>
                   <p className="text-muted-foreground">{item.organization}</p>
-                  <p className="date-pill w-fit">{item.period}</p>
+                  {item.url && (
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex text-xs font-semibold text-blue-700 hover:underline dark:text-blue-300"
+                    >
+                      Verify credential
+                    </a>
+                  )}
                 </article>
               ))}
             </CardContent>
@@ -76,7 +97,7 @@ export function CredentialHighlights() {
                 <article key={item.title} className="space-y-1.5">
                   <p className="font-semibold">{item.title}</p>
                   <p className="text-muted-foreground">{item.detail}</p>
-                  <p className="date-pill w-fit">{item.period}</p>
+                  {item.period && <p className="date-pill w-fit">{item.period}</p>}
                 </article>
               ))}
             </CardContent>

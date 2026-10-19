@@ -8,8 +8,9 @@ import type { AppController, ContactHandoffClaimResult } from './app-controller'
 export interface Env {
   AI: Ai
   AI_PROVIDER?: string
-  CF_AI_BASE_URL: string
+  CF_AI_BASE_URL?: string
   CF_AI_GATEWAY_TOKEN?: string
+  GOOGLE_GENERATIVE_AI_API_KEY?: string
   // Optional bearer token for the GET /api/health/ai probe. When set, the
   // endpoint requires `Authorization: Bearer <token>`; when unset the probe is
   // open (still cost-bounded by its server-side cache).

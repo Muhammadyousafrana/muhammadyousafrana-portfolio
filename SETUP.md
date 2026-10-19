@@ -251,12 +251,11 @@ Then iterate with them over a few rounds on the **content and copy**:
 - Are the chat **starter prompts** the questions a recruiter would actually ask?
 - Do the SEO title/description look right in the browser tab?
 
-> **Testing the AI chat / fit-check locally** uses the default Workers AI binding and needs Wrangler
-> authentication plus `.dev.vars` values for `CF_AI_BASE_URL` and `SECURITY_HMAC_SECRET`. On a fresh
-> checkout those are not set. Copy `.dev.vars.example` to `.dev.vars`, fill in the Gateway locator
-> and HMAC secret, and run `bunx wrangler login`. `CF_AI_GATEWAY_TOKEN` is needed only when
-> `AI_PROVIDER=google-gateway`. Otherwise treat the preview as UI/content only and defer AI testing
-> to the deployed site.
+> **Testing AI locally:** `.dev.vars.example` selects `google-ai-studio`, which calls Gemini directly
+> and does not require a Cloudflare AI Gateway. Create a Google AI Studio API key and put it in the
+> gitignored `.dev.vars` as `GOOGLE_GENERATIVE_AI_API_KEY`; also replace the
+> `SECURITY_HMAC_SECRET` placeholder. Review Google's free-tier data-use terms before sending
+> recruiter or personal data. Gateway-backed providers still require `CF_AI_BASE_URL`.
 
 Refine `content/portfolio.yaml` and `content/prose/summary.md`, rerun `bun run content:build`, and
 let the browser hot-reload. Repeat until the user is happy.
@@ -282,17 +281,13 @@ Walk the user through these steps in order. The **USER ACTION** steps are theirs
    `wrangler.jsonc` (`"name"`). Pick it before setting any secrets.
 2. **USER ACTION - create / verify a Cloudflare account** and confirm the account has a `workers.dev`
    subdomain enabled (the dashboard prompts for one on first Workers use).
-3. **USER ACTION - create an AI Gateway.** In the Cloudflare dashboard, create an AI Gateway and note
-   its **account id** and **gateway slug**. The default `workers-ai` provider uses the Worker `AI`
-   binding and needs no provider key. If the user switches `AI_PROVIDER` to `google-gateway`, they
-   must also fund inference and create an Authenticated Gateway token for `CF_AI_GATEWAY_TOKEN`. For Google
-   BYOK, obtain a key from [Google AI Studio](https://aistudio.google.com/api-keys), then in Cloudflare
-   go to **AI > AI Gateway > select the gateway > Provider Keys > Add API Key**, choose
-   **Google AI Studio**, and save the Google key there. The Google key stays in Cloudflare; it is not
-   `CF_AI_GATEWAY_TOKEN`. See [`DEPLOYMENT.md`](DEPLOYMENT.md#ai-gateway-setup).
-4. **Replace the `CF_AI_BASE_URL` sentinel** in `wrangler.jsonc`. Substitute the `REPLACE_WITH_ACCOUNT_ID`
-   and `REPLACE_WITH_GATEWAY_SLUG` segments with the account id and gateway slug from step 3. Keep the
-   `/compat` suffix; the predeploy validator refuses to deploy while the sentinel is present.
+3. **Choose an AI provider.** For `google-ai-studio`, set `AI_PROVIDER` to that value in
+   `wrangler.jsonc` and use a Google API key; no AI Gateway is needed. For the default `workers-ai`
+   or optional `google-gateway`, create a Cloudflare AI Gateway and note its **account id** and
+   **gateway slug**. `google-gateway` also needs an Authenticated Gateway token and Google AI Studio
+   provider key stored in the Gateway. See [`DEPLOYMENT.md`](DEPLOYMENT.md#ai-gateway-setup).
+4. **Gateway providers only:** replace the `CF_AI_BASE_URL` sentinel in `wrangler.jsonc` with the
+   account id and gateway slug from step 3. Keep `/compat`; direct `google-ai-studio` does not use it.
 5. **USER ACTION - authenticate Wrangler:** `bunx wrangler login` (or export `CLOUDFLARE_API_TOKEN`
    for CI).
 6. **First publish:** `bun run deploy:init`. This validates config, builds, publishes the Worker
@@ -306,7 +301,8 @@ Walk the user through these steps in order. The **USER ACTION** steps are theirs
    bunx wrangler secret put SECURITY_HMAC_SECRET # a long random string
    ```
 
-   For `AI_PROVIDER=google-gateway`, also set `CF_AI_GATEWAY_TOKEN` to the Authenticated Gateway token.
+   For `AI_PROVIDER=google-gateway`, also set `CF_AI_GATEWAY_TOKEN`. For
+   `AI_PROVIDER=google-ai-studio`, set `GOOGLE_GENERATIVE_AI_API_KEY` instead.
 
 8. **USER ACTION - set optional secrets** only if the user wants those features:
    - **SMS contact handoff (Twilio):** `CONTACT_SMS_TO_NUMBER` (the owner's destination number, E.164),
@@ -317,7 +313,7 @@ Walk the user through these steps in order. The **USER ACTION** steps are theirs
    `predeploy:validate` cannot inspect remote secrets, so confirm by hand before deploying:
 
    ```bash
-   bunx wrangler secret list   # expect SECURITY_HMAC_SECRET (+ CF_AI_GATEWAY_TOKEN for Google)
+   bunx wrangler secret list   # expect SECURITY_HMAC_SECRET and the selected provider key
    ```
 
 10. **Normal deploy:** run it in the same terminal so the env var is in scope (agent shell calls do

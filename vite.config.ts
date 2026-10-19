@@ -134,12 +134,12 @@ function reloadTriggerPlugin() {
 }
 
 // https://vite.dev/config/
-export default ({ mode }: { mode: string }) => {
+export default ({ mode, command }: { mode: string; command: 'build' | 'serve' }) => {
   const env = loadEnv(mode, process.cwd())
   return defineConfig({
     plugins: [
       react(),
-      cloudflare(),
+      cloudflare({ remoteBindings: command !== 'serve' }),
       seoIndexHtmlPlugin(),
       watchDependenciesPlugin(),
       reloadTriggerPlugin(),
@@ -160,6 +160,7 @@ export default ({ mode }: { mode: string }) => {
     },
     server: {
       allowedHosts: true,
+      port: Number(process.env.PORT) || 3000,
       watch: {
         awaitWriteFinish: {
           stabilityThreshold: 150,

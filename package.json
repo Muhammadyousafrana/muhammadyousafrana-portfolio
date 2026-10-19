@@ -8,7 +8,7 @@
     "content:build": "bun --no-env-file scripts/build-content.ts",
     "content:check": "bun --no-env-file scripts/build-content.ts --check",
     "predev": "bun run content:build",
-    "dev": "vite --host 0.0.0.0 --port ${PORT:-3000}",
+    "dev": "vite --host 0.0.0.0",
     "prebuild": "bun run content:build",
     "build": "vite build",
     "pretest": "bun run content:build",

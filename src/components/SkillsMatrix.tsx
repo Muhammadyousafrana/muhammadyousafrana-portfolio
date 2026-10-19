@@ -15,7 +15,11 @@ export function SkillsMatrix() {
   }
 
   return (
-    <section id="skills" className="scroll-mt-24" aria-labelledby="skills-title">
+    <section
+      id="skills"
+      className="relative left-1/2 w-[calc(100vw-2rem)] max-w-[80rem] -translate-x-1/2 scroll-mt-24"
+      aria-labelledby="skills-title"
+    >
       <div className="mb-12 md:mb-14 space-y-3">
         <h2 id="skills-title" className="text-3xl md:text-4xl font-bold tracking-tight">
           Technical Competencies

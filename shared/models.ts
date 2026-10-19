@@ -1,4 +1,4 @@
-export const AI_PROVIDER_IDS = ['workers-ai', 'google-gateway'] as const
+export const AI_PROVIDER_IDS = ['workers-ai', 'google-gateway', 'google-ai-studio'] as const
 
 export type AiProviderId = (typeof AI_PROVIDER_IDS)[number]
 export type ModelCandidates = readonly [string, ...string[]]
@@ -11,6 +11,7 @@ const MODEL_CHAINS = {
     'google-ai-studio/gemini-3.1-flash-lite',
     'google-ai-studio/gemini-3-flash-preview',
   ],
+  'google-ai-studio': ['gemini-3.5-flash-lite'],
 } as const
 
 export const parseAiProvider = (value?: string | null): AiProviderId | undefined => {
