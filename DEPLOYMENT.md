@@ -45,7 +45,8 @@ bunx wrangler secret put SECURITY_HMAC_SECRET
 # 4. Confirm the required secret exists (predeploy skips remote secret checks under
 #    `wrangler login`, so verify by hand), then do the real deploy in the same terminal.
 bunx wrangler secret list   # expect SECURITY_HMAC_SECRET + selected provider secret
-SMOKE_BASE_URL=https://<name>.<subdomain>.workers.dev bun run deploy
+$env:SMOKE_BASE_URL = "https://<name>.<subdomain>.workers.dev"
+bun run deploy
 ```
 
 `deploy:init` publishes the Worker before `SECURITY_HMAC_SECRET` exists, so protected AI surfaces are
@@ -78,6 +79,26 @@ SMOKE_BASE_URL=https://<name>.<subdomain>.workers.dev bun run deploy
 - `bun run smoke:ai:online` - opt-in live verification of health, chat streaming, Workers tool
   continuation, and structured fit output. It skips unless `SMOKE_BASE_URL` and `AI_HEALTH_TOKEN`
   are provided.
+
+## GitHub Actions deployment
+
+`.github/workflows/ci.yml` runs checks on pushes and pull requests. Its Cloudflare deploy job waits
+for checks and only runs on pushes to `main` when the repository variable
+`CF_WORKER_DEPLOY_ENABLED` is exactly `true`. Keep it unset until the first Worker is deployed and
+its runtime secrets are configured.
+
+In the GitHub repository, open **Settings > Secrets and variables > Actions** and add:
+
+- **Secrets:** `CLOUDFLARE_API_TOKEN` (scoped to this account with Workers deploy permission) and
+  `CLOUDFLARE_ACCOUNT_ID`.
+- **Variables:** `CF_WORKER_DEPLOY_ENABLED=true`, `VITE_TURNSTILE_SITE_KEY` (the public site key),
+  and `SMOKE_BASE_URL` (`https://ai-portfolio.<your-subdomain>.workers.dev`).
+
+The Worker runtime secrets (`SECURITY_HMAC_SECRET`, `TURNSTILE_SECRET_KEY`, and any selected AI
+provider key) remain in Cloudflare and are checked by `predeploy:validate`; do not copy them into the
+repository or build variables. Once the GitHub values and Cloudflare secrets are ready, enable the
+deploy variable. Every subsequent push to `main` runs CI first, then deploys and smoke-tests the
+Worker. Pull requests run checks only.
 
 ## AI Gateway setup
 
@@ -148,7 +169,7 @@ required.
 | `RATE_LIMIT_WINDOW_SECONDS`, `CHAT_RATE_LIMIT_PER_TENANT`, `CHAT_RATE_LIMIT_PER_IP`  | `wrangler.jsonc`                          | Required runtime vars                       | Rate-limit tuning. Change here, then redeploy.                                                                                                                                              |
 | `AI_RATE_LIMIT_PER_TENANT`, `AI_RATE_LIMIT_PER_IP`, `CLIENT_ERROR_RATE_LIMIT_PER_IP` | `wrangler.jsonc`                          | Required runtime vars                       | Rate-limit tuning.                                                                                                                                                                          |
 | `MAX_CHAT_REQUEST_BYTES`, `MAX_FIT_ANALYZE_BYTES`, `MAX_CLIENT_ERROR_BYTES`          | `wrangler.jsonc`                          | Required runtime vars                       | Request-size caps.                                                                                                                                                                          |
-| `REQUIRE_TURNSTILE`                                                                  | `wrangler.jsonc`                          | Required runtime var                        | Must be `"true"`/`"false"`. Set `"true"` only when both the server secret and frontend site key are ready.                                                                                  |
+| `REQUIRE_TURNSTILE`                                                                  | `wrangler.jsonc`                          | Required runtime var                        | Production default is `"true"`; local `.dev.vars` may override it to `"false"`.                                                                                                             |
 | `ALLOWED_ORIGINS`                                                                    | `wrangler.jsonc` (optional)               | Optional runtime var                        | Only needed for split-host / custom-domain cross-origin access. Same-origin `workers.dev` does not need it.                                                                                 |
 | `CF_AI_GATEWAY_TOKEN`                                                                | Wrangler secret; `.dev.vars` locally      | Only for `AI_PROVIDER=google-gateway`       | The Authenticated Gateway token. Workers AI uses the `AI` binding instead.                                                                                                                  |
 | `GOOGLE_GENERATIVE_AI_API_KEY`                                                       | Wrangler secret; `.dev.vars` locally      | Only for `AI_PROVIDER=google-ai-studio`     | Google AI Studio key; server-side only.                                                                                                                                                     |
