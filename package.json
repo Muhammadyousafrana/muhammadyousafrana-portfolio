@@ -29,7 +29,7 @@
     "smoke:ai:online": "bun --no-env-file scripts/smoke-ai-online.ts",
     "deploy:dry-run": "bun run predeploy:validate && bun run build && bunx wrangler deploy --dry-run --strict",
     "deploy": "bun run predeploy:validate && bun run build && bunx wrangler deploy --strict && bun run smoke:ai",
-    "deploy:init": "bun run predeploy:validate && bun run build && bunx wrangler deploy --strict && echo 'First deploy done. Now set SECURITY_HMAC_SECRET (also CF_AI_GATEWAY_TOKEN only for AI_PROVIDER=google-gateway; add TURNSTILE_SECRET_KEY if REQUIRE_TURNSTILE=true, and the Twilio secrets for SMS). Then set SMOKE_BASE_URL to your workers.dev URL and run: bun run smoke:ai' && (bun run smoke:ai || echo 'Smoke check did not pass yet (expected before secrets and SMOKE_BASE_URL are set).')",
+    "deploy:init": "bun run predeploy:validate && bun run build && bunx wrangler deploy --strict && echo 'First deploy done. Now set SECURITY_HMAC_SECRET and GOOGLE_GENERATIVE_AI_API_KEY (add TURNSTILE_SECRET_KEY if REQUIRE_TURNSTILE=true, and the Twilio secrets for SMS). Then set SMOKE_BASE_URL to your workers.dev URL and run: bun run smoke:ai' && (bun run smoke:ai || echo 'Smoke check did not pass yet (expected before secrets and SMOKE_BASE_URL are set).')",
     "cf-typegen": "bunx wrangler types"
   },
   "dependencies": {

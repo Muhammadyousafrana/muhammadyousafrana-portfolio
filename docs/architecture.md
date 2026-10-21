@@ -66,12 +66,10 @@ sanitizes/validates it, runs `streamText`, assembles the prompt, and exposes too
 tools [`worker/chat-tools.ts`](../worker/chat-tools.ts) +
 [`shared/chat-tools.ts`](../shared/chat-tools.ts)._
 
-**AI transport.** `AI_PROVIDER` selects a provider profile without changing routes. `workers-ai`
-uses the Worker `AI` binding with Gemma primary and GLM fallback; `google-gateway` preserves the
-native Google/compat split through Cloudflare; `google-ai-studio` uses the native Google SDK and a
-server-side API key directly. Only the Gateway-backed profiles use `CF_AI_BASE_URL`. _Canonical:
-[`worker/model-utils.ts`](../worker/model-utils.ts), [`shared/models.ts`](../shared/models.ts). Model
-policy: [`ai-model-strategy.md`](./ai-model-strategy.md)._
+**AI transport.** The deployed config selects `google-ai-studio`, which calls Gemini directly with
+the server-side `GOOGLE_GENERATIVE_AI_API_KEY`. It needs no Cloudflare AI binding or AI Gateway.
+Canonical sources: [`worker/model-utils.ts`](../worker/model-utils.ts) and
+[`shared/models.ts`](../shared/models.ts). See [ai-model-strategy.md](./ai-model-strategy.md).
 
 **Helper route (fit).** `/api/analyze-fit` (one-shot provider-side `json_schema`, strict against the
 shared fit schema) shares the model order with chat but keeps app-side fallback and `maxRetries: 0`.

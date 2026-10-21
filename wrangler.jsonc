@@ -26,29 +26,17 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*", "!/api/docs/*"],
   },
-  "ai": {
-    "binding": "AI",
-    "remote": true,
-  },
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
   },
-  // Secrets expected via Wrangler: SECURITY_HMAC_SECRET plus contact-flow
-  // secrets below. CF_AI_GATEWAY_TOKEN is needed only for google-gateway.
+  // Secrets expected via Wrangler: SECURITY_HMAC_SECRET,
+  // GOOGLE_GENERATIVE_AI_API_KEY, and optional contact-flow secrets below.
   // CONTACT_SMS_TO_NUMBER,
   // TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER
   "vars": {
-    // One switch selects the provider-specific model chain. Workers AI uses the
-    // AI binding; google-gateway preserves the native Google + Gateway path.
-    "AI_PROVIDER": "workers-ai",
-    // CF_AI_BASE_URL is a Cloudflare AI Gateway locator. The Worker parses this
-    // compat-shaped URL to extract the account and gateway ids. Each runtime uses
-    // the gateway id through its native transport. The compat suffix is the
-    // required locator shape. Replace
-    // the REPLACE_WITH_* segments with your Cloudflare account id and AI Gateway
-    // slug before deploying (predeploy-validate refuses to deploy the sentinel).
-    "CF_AI_BASE_URL": "https://gateway.ai.cloudflare.com/v1/REPLACE_WITH_ACCOUNT_ID/REPLACE_WITH_GATEWAY_SLUG/compat",
+    // Call Gemini directly with a server-side Google AI Studio API key.
+    "AI_PROVIDER": "google-ai-studio",
     "SESSION_COOKIE_NAME": "chat_tenant",
     "SESSION_COOKIE_MAX_AGE_SECONDS": "2592000",
     "RATE_LIMIT_WINDOW_SECONDS": "60",

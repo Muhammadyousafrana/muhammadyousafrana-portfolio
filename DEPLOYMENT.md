@@ -31,8 +31,7 @@ bun run dev
 ### First deploy (fresh account)
 
 ```bash
-# 1. Set your Worker `name`. Replace the CF_AI_BASE_URL sentinel only if using
-#    workers-ai or google-gateway; google-ai-studio calls Gemini directly.
+# 1. Set your Worker `name`. The AI provider is already configured for Gemini.
 bunx wrangler login
 
 # 2. First publish (creates the Worker; secrets not set yet).
@@ -49,10 +48,9 @@ $env:SMOKE_BASE_URL = "https://<name>.<subdomain>.workers.dev"
 bun run deploy
 ```
 
-`deploy:init` publishes the Worker before `SECURITY_HMAC_SECRET` exists, so protected AI surfaces are
+`deploy:init` publishes the Worker before its required secrets exist, so protected AI surfaces are
 non-functional until step 3 (the static page still renders). It is a one-time bootstrap. After that,
-`bun run deploy` is your normal loop. Also set `CF_AI_GATEWAY_TOKEN` for `google-gateway`, or
-`GOOGLE_GENERATIVE_AI_API_KEY` for direct `google-ai-studio`.
+`bun run deploy` is your normal loop.
 
 ### Normal deploy
 
@@ -65,10 +63,9 @@ SMOKE_BASE_URL=https://<name>.<subdomain>.workers.dev bun run deploy
 ## Deploy commands
 
 - `bun run predeploy:validate` - parses `wrangler.jsonc` and fails closed if a required var is
-  missing, if an AI Gateway-backed provider's `CF_AI_BASE_URL` still contains the `REPLACE_WITH_` sentinel, or (when
-  `CLOUDFLARE_API_TOKEN` is set and the Worker already exists) if a required Wrangler secret is
-  missing. With no `CLOUDFLARE_API_TOKEN`, remote secret inspection is skipped, so local dry-runs
-  need no credentials.
+  missing or (when `CLOUDFLARE_API_TOKEN` is set and the Worker already exists) if a required
+  Wrangler secret is missing. With no `CLOUDFLARE_API_TOKEN`, remote secret inspection is skipped,
+  so local dry-runs need no credentials.
 - `bun run deploy:dry-run` - `predeploy:validate` + build + `wrangler deploy --dry-run --strict`.
 - `bun run deploy:init` - one-time fresh-account bootstrap: `predeploy:validate` + build +
   `wrangler deploy --strict`, then prints the secret-setup instructions and runs a best-effort smoke
@@ -100,44 +97,15 @@ repository or build variables. Once the GitHub values and Cloudflare secrets are
 deploy variable. Every subsequent push to `main` runs CI first, then deploys and smoke-tests the
 Worker. Pull requests run checks only.
 
-## AI Gateway setup
+## Gemini setup
 
-The Worker can route through Cloudflare AI Gateway or call Google AI Studio directly.
-
-1. For `workers-ai` or `google-gateway`, create an **AI Gateway** in Cloudflare. Note its **account id** and **gateway
-   slug**.
-2. The default `workers-ai` provider uses the Worker `AI` binding and needs no provider API key.
-   Workers AI usage is billed to the Cloudflare account.
-3. For the optional `google-gateway` provider, ensure inference is funded: either
-   [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) credits,
-   or a stored provider key via
-   [Bring Your Own Keys](https://developers.cloudflare.com/ai-gateway/configuration/bring-your-own-keys/).
-   Its models are `google-ai-studio/*`, so a BYOK key must be a **Google AI Studio** key. To configure
-   BYOK:
-   1. Create the key at [Google AI Studio](https://aistudio.google.com/api-keys).
-   2. In Cloudflare, go to **AI > AI Gateway > select the gateway > Provider Keys > Add API Key**.
-   3. Choose **Google AI Studio**, paste the Google key, and save it.
-
-   This Google provider key stays in Cloudflare and is not an application environment variable.
-
-4. For `google-gateway`, create an
-   [Authenticated Gateway](https://developers.cloudflare.com/ai-gateway/configuration/authentication/)
-   token. This separate Cloudflare token is what you set as the `CF_AI_GATEWAY_TOKEN` secret; do not
-   put the Google AI Studio key in `CF_AI_GATEWAY_TOKEN`.
-5. In `wrangler.jsonc`, replace the sentinel segments of `CF_AI_BASE_URL`
-   (`REPLACE_WITH_ACCOUNT_ID` / `REPLACE_WITH_GATEWAY_SLUG`) with your account id and gateway slug.
-   Keep the trailing `/compat`; the Worker parses this compat-shaped locator for the ids and
-   `predeploy:validate` refuses to deploy while the sentinel is present.
-
-## Direct Google AI Studio
-
-For local testing without an AI Gateway, set `AI_PROVIDER=google-ai-studio` in `.dev.vars` and add
-`GOOGLE_GENERATIVE_AI_API_KEY` there. Create a key in [Google AI Studio](https://aistudio.google.com/api-keys).
-The key is read only by the Worker and must never use a `VITE_` prefix. For deployment, set
-`AI_PROVIDER=google-ai-studio` in `wrangler.jsonc` and add the key interactively with
-`bunx wrangler secret put GOOGLE_GENERATIVE_AI_API_KEY`. The selected model is
-`gemini-3.5-flash-lite`; verify current eligibility, free quotas, and data handling in Google's
-[model list](https://ai.google.dev/gemini-api/docs/models) and [pricing page](https://ai.google.dev/gemini-api/docs/pricing).
+The Worker calls Google AI Studio directly. `wrangler.jsonc` selects `google-ai-studio`; no Cloudflare
+AI Gateway or AI binding is needed. Create a key at [Google AI Studio](https://aistudio.google.com/api-keys).
+For local development, put it in gitignored `.dev.vars` as `GOOGLE_GENERATIVE_AI_API_KEY`. For
+production, set it interactively with `bunx wrangler secret put GOOGLE_GENERATIVE_AI_API_KEY`. Keep
+the key server-side and never use a `VITE_` prefix. The selected model is `gemini-3.5-flash-lite`;
+check Google's [model list](https://ai.google.dev/gemini-api/docs/models) and
+[pricing page](https://ai.google.dev/gemini-api/docs/pricing) for current eligibility and terms.
 
 ## Online AI verification
 
@@ -147,31 +115,24 @@ optional `AI_HEALTH_TOKEN` Worker secret, and run:
 ```bash
 SMOKE_BASE_URL=https://<name>.<subdomain>.workers.dev \
 AI_HEALTH_TOKEN=<matching-health-token> \
-AI_PROVIDER=workers-ai \
+AI_PROVIDER=google-ai-studio \
 bun run smoke:ai:online
 ```
 
 The script skips without both URL and health token. It verifies authenticated health, a real chat
-stream with no reasoning events, a Workers weather-tool continuation, and schema-valid fit output.
-Set `AI_PROVIDER=google-gateway` or `google-ai-studio` to verify Google health, chat, and fit. For
-direct AI Studio, the online test uses the deployed Worker secret. To test Google BYOK, use a
-dedicated gateway without Unified Billing: the check should fail before its Google provider key is
-stored and pass after adding the key under **AI > AI Gateway > Provider Keys**; no Worker redeploy is
-required.
+stream, a weather-tool continuation, and schema-valid fit output using the deployed Gemini key.
 
 ## What lives where
 
 | Variable                                                                             | Where it lives                            | When it is needed                           | Notes                                                                                                                                                                                       |
 | ------------------------------------------------------------------------------------ | ----------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AI_PROVIDER`                                                                        | `wrangler.jsonc`; `.dev.vars` locally     | Required runtime var                        | `workers-ai` (default), `google-gateway`, or direct `google-ai-studio`. Model chains live in `shared/models.ts`.                                                                            |
-| `CF_AI_BASE_URL`                                                                     | `wrangler.jsonc`; `.dev.vars` locally     | Gateway providers only                      | AI Gateway locator. Keep the `/compat` suffix.                                                                                                                                              |
+| `AI_PROVIDER`                                                                        | `wrangler.jsonc`; `.dev.vars` locally     | Required runtime var                        | `google-ai-studio` (direct Gemini API).                                                                                                                                                     |
 | `SESSION_COOKIE_NAME`, `SESSION_COOKIE_MAX_AGE_SECONDS`                              | `wrangler.jsonc`                          | Required runtime vars                       | Source-controlled Worker vars.                                                                                                                                                              |
 | `RATE_LIMIT_WINDOW_SECONDS`, `CHAT_RATE_LIMIT_PER_TENANT`, `CHAT_RATE_LIMIT_PER_IP`  | `wrangler.jsonc`                          | Required runtime vars                       | Rate-limit tuning. Change here, then redeploy.                                                                                                                                              |
 | `AI_RATE_LIMIT_PER_TENANT`, `AI_RATE_LIMIT_PER_IP`, `CLIENT_ERROR_RATE_LIMIT_PER_IP` | `wrangler.jsonc`                          | Required runtime vars                       | Rate-limit tuning.                                                                                                                                                                          |
 | `MAX_CHAT_REQUEST_BYTES`, `MAX_FIT_ANALYZE_BYTES`, `MAX_CLIENT_ERROR_BYTES`          | `wrangler.jsonc`                          | Required runtime vars                       | Request-size caps.                                                                                                                                                                          |
 | `REQUIRE_TURNSTILE`                                                                  | `wrangler.jsonc`                          | Required runtime var                        | Production default is `"true"`; local `.dev.vars` may override it to `"false"`.                                                                                                             |
 | `ALLOWED_ORIGINS`                                                                    | `wrangler.jsonc` (optional)               | Optional runtime var                        | Only needed for split-host / custom-domain cross-origin access. Same-origin `workers.dev` does not need it.                                                                                 |
-| `CF_AI_GATEWAY_TOKEN`                                                                | Wrangler secret; `.dev.vars` locally      | Only for `AI_PROVIDER=google-gateway`       | The Authenticated Gateway token. Workers AI uses the `AI` binding instead.                                                                                                                  |
 | `GOOGLE_GENERATIVE_AI_API_KEY`                                                       | Wrangler secret; `.dev.vars` locally      | Only for `AI_PROVIDER=google-ai-studio`     | Google AI Studio key; server-side only.                                                                                                                                                     |
 | `SECURITY_HMAC_SECRET`                                                               | Wrangler secret; `.dev.vars` locally      | Required runtime secret                     | Signs tenant cookie identity and challenge leases. Use a long random string.                                                                                                                |
 | `VITE_TURNSTILE_SITE_KEY`                                                            | Shell/CI or `.env.local` (Vite build env) | Required only when `REQUIRE_TURNSTILE=true` | Build-time only, baked into the frontend bundle. `predeploy:validate` requires a non-empty value; it does not distinguish real from test keys, so set your production key for real deploys. |
@@ -191,10 +152,7 @@ values go in the gitignored `.dev.vars`.
 # Required
 bunx wrangler secret put SECURITY_HMAC_SECRET
 
-# Only for AI_PROVIDER=google-gateway
-bunx wrangler secret put CF_AI_GATEWAY_TOKEN
-
-# Only for AI_PROVIDER=google-ai-studio
+# Required for Gemini
 bunx wrangler secret put GOOGLE_GENERATIVE_AI_API_KEY
 
 # Turnstile (only if REQUIRE_TURNSTILE=true)

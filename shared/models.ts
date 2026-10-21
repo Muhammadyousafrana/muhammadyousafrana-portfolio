@@ -3,7 +3,7 @@ export const AI_PROVIDER_IDS = ['workers-ai', 'google-gateway', 'google-ai-studi
 export type AiProviderId = (typeof AI_PROVIDER_IDS)[number]
 export type ModelCandidates = readonly [string, ...string[]]
 
-const DEFAULT_AI_PROVIDER: AiProviderId = 'workers-ai'
+const DEFAULT_AI_PROVIDER: AiProviderId = 'google-ai-studio'
 
 const MODEL_CHAINS = {
   'workers-ai': ['@cf/google/gemma-4-26b-a4b-it', '@cf/zai-org/glm-4.7-flash'],

@@ -252,10 +252,10 @@ Then iterate with them over a few rounds on the **content and copy**:
 - Do the SEO title/description look right in the browser tab?
 
 > **Testing AI locally:** `.dev.vars.example` selects `google-ai-studio`, which calls Gemini directly
-> and does not require a Cloudflare AI Gateway. Create a Google AI Studio API key and put it in the
+> and does not require Cloudflare AI Gateway. Create a Google AI Studio API key and put it in the
 > gitignored `.dev.vars` as `GOOGLE_GENERATIVE_AI_API_KEY`; also replace the
-> `SECURITY_HMAC_SECRET` placeholder. Review Google's free-tier data-use terms before sending
-> recruiter or personal data. Gateway-backed providers still require `CF_AI_BASE_URL`.
+> `SECURITY_HMAC_SECRET` placeholder. Review Google's data-use terms before sending recruiter or
+> personal data.
 
 Refine `content/portfolio.yaml` and `content/prose/summary.md`, rerun `bun run content:build`, and
 let the browser hot-reload. Repeat until the user is happy.
@@ -281,62 +281,55 @@ Walk the user through these steps in order. The **USER ACTION** steps are theirs
    `wrangler.jsonc` (`"name"`). Pick it before setting any secrets.
 2. **USER ACTION - create / verify a Cloudflare account** and confirm the account has a `workers.dev`
    subdomain enabled (the dashboard prompts for one on first Workers use).
-3. **Choose an AI provider.** For `google-ai-studio`, set `AI_PROVIDER` to that value in
-   `wrangler.jsonc` and use a Google API key; no AI Gateway is needed. For the default `workers-ai`
-   or optional `google-gateway`, create a Cloudflare AI Gateway and note its **account id** and
-   **gateway slug**. `google-gateway` also needs an Authenticated Gateway token and Google AI Studio
-   provider key stored in the Gateway. See [`DEPLOYMENT.md`](DEPLOYMENT.md#ai-gateway-setup).
-4. **Gateway providers only:** replace the `CF_AI_BASE_URL` sentinel in `wrangler.jsonc` with the
-   account id and gateway slug from step 3. Keep `/compat`; direct `google-ai-studio` does not use it.
-5. **USER ACTION - authenticate Wrangler:** `bunx wrangler login` (or export `CLOUDFLARE_API_TOKEN`
+3. **Set up Gemini:** `wrangler.jsonc` already selects `google-ai-studio`. Create a Google AI Studio
+   API key at <https://aistudio.google.com/api-keys>; keep it ready to enter as a Worker secret.
+4. **USER ACTION - authenticate Wrangler:** `bunx wrangler login` (or export `CLOUDFLARE_API_TOKEN`
    for CI).
-6. **First publish:** `bun run deploy:init`. This validates config, builds, publishes the Worker
+5. **First publish:** `bun run deploy:init`. This validates config, builds, publishes the Worker
    (creating it), and prints the secret instructions. Note: `deploy:init` publishes **before** secrets
    exist, so the AI chat and fit-check are non-functional until the next steps (the static page still
    renders). It is a one-time bootstrap, not your normal loop.
-7. **USER ACTION - set the required secret** (the user enters values at the Wrangler prompt; you
+6. **USER ACTION - set the required secrets** (the user enters values at the Wrangler prompt; you
    never see them):
 
    ```bash
    bunx wrangler secret put SECURITY_HMAC_SECRET # a long random string
+   bunx wrangler secret put GOOGLE_GENERATIVE_AI_API_KEY # Google AI Studio key
    ```
 
-   For `AI_PROVIDER=google-gateway`, also set `CF_AI_GATEWAY_TOKEN`. For
-   `AI_PROVIDER=google-ai-studio`, set `GOOGLE_GENERATIVE_AI_API_KEY` instead.
-
-8. **USER ACTION - set optional secrets** only if the user wants those features:
+7. **USER ACTION - set optional secrets** only if the user wants those features:
    - **SMS contact handoff (Twilio):** `CONTACT_SMS_TO_NUMBER` (the owner's destination number, E.164),
      `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`. If these are not all set, the
      contact flow safely runs in simulation mode.
    - **Turnstile bot protection:** production requires it by default. Create the widget and provide
      its production site key at build time; after the first Worker deploy, set its secret key before
      exposing AI traffic. Keep the local `.dev.vars` override disabled for local development only.
-9. **USER ACTION - verify the required secrets exist.** Under `bunx wrangler login`,
+8. **USER ACTION - verify the required secrets exist.** Under `bunx wrangler login`,
    `predeploy:validate` cannot inspect remote secrets, so confirm by hand before deploying:
 
    ```bash
-   bunx wrangler secret list   # expect SECURITY_HMAC_SECRET and the selected provider key
+   bunx wrangler secret list   # expect SECURITY_HMAC_SECRET and GOOGLE_GENERATIVE_AI_API_KEY
    ```
 
-10. **Normal deploy:** run it in the same terminal so the env var is in scope (agent shell calls do
-    not reliably share state, so pass `SMOKE_BASE_URL` inline). If the user set an `AI_HEALTH_TOKEN`
-    secret, prefix the matching `AI_HEALTH_TOKEN=...` too so the smoke probe can authenticate.
+9. **Normal deploy:** run it in the same terminal so the env var is in scope (agent shell calls do
+   not reliably share state, so pass `SMOKE_BASE_URL` inline). If the user set an `AI_HEALTH_TOKEN`
+   secret, prefix the matching `AI_HEALTH_TOKEN=...` too so the smoke probe can authenticate.
 
-    ```bash
-    SMOKE_BASE_URL=https://<name>.<subdomain>.workers.dev bun run deploy
-    ```
+   ```bash
+   SMOKE_BASE_URL=https://<name>.<subdomain>.workers.dev bun run deploy
+   ```
 
-    This revalidates (now that secrets exist), builds, deploys with `--strict`, and runs the
-    post-deploy AI health smoke check. Use `bun run deploy:dry-run` anytime to validate + build
-    without publishing. From here on, `bun run deploy` is the loop, not `deploy:init`.
+   This revalidates (now that secrets exist), builds, deploys with `--strict`, and runs the
+   post-deploy AI health smoke check. Use `bun run deploy:dry-run` anytime to validate + build
+   without publishing. From here on, `bun run deploy` is the loop, not `deploy:init`.
 
-    > **Recovery note:** `deploy:init` is fresh-Worker-only. If validation later reports an existing
-    > Worker with missing secrets, have the user set the secrets, then use normal `bun run deploy`.
+   > **Recovery note:** `deploy:init` is fresh-Worker-only. If validation later reports an existing
+   > Worker with missing secrets, have the user set the secrets, then use normal `bun run deploy`.
 
-11. **Verify production bot protection:** confirm `REQUIRE_TURNSTILE: "true"`, the production
+10. **Verify production bot protection:** confirm `REQUIRE_TURNSTILE: "true"`, the production
     `TURNSTILE_SECRET_KEY`, and the matching real (non-test) `VITE_TURNSTILE_SITE_KEY` are set before
     enabling public AI use. See `DEPLOYMENT.md`.
-12. **Optional - custom domain:** with the zone already on the user's Cloudflare account, add a
+11. **Optional - custom domain:** with the zone already on the user's Cloudflare account, add a
     `routes` block with `custom_domain: true` to `wrangler.jsonc` and redeploy; Cloudflare provisions
     the DNS record and TLS certificate. See the custom-domain section of `DEPLOYMENT.md`.
 

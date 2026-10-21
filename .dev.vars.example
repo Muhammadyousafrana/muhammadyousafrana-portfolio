@@ -3,16 +3,10 @@
 # These are placeholders only.
 
 # --- Required: AI chat + fit-analysis ---
-# Google AI Studio is the simplest free local test provider. Create a key at
+# Create a Google AI Studio API key at
 # https://aistudio.google.com/api-keys and keep it server-side in this file.
 AI_PROVIDER=google-ai-studio
 GOOGLE_GENERATIVE_AI_API_KEY=replace-with-your-google-ai-studio-key
-# Or set AI_PROVIDER=workers-ai / google-gateway to use the Cloudflare AI Gateway.
-# AI Gateway locator (compat-shaped URL). Replace the REPLACE_WITH_* segments with
-# your Cloudflare account id and AI Gateway slug. Gateway-backed providers need it.
-CF_AI_BASE_URL=https://gateway.ai.cloudflare.com/v1/REPLACE_WITH_ACCOUNT_ID/REPLACE_WITH_GATEWAY_SLUG/compat
-# Required only for AI_PROVIDER=google-gateway: Authenticated Gateway token.
-#CF_AI_GATEWAY_TOKEN=your-ai-gateway-token
 # Secret used to sign session / challenge state. Use a long random string.
 SECURITY_HMAC_SECRET=replace-with-a-long-random-string
 
@@ -37,10 +31,3 @@ REQUIRE_TURNSTILE=false
 # --- Optional: AI health probe bearer token ---
 # When set, GET /api/health/ai requires `Authorization: Bearer <token>`.
 #AI_HEALTH_TOKEN=your-health-probe-token
-
-# --- Optional: Wrangler deploy authentication (set in your shell or CI) ---
-# These authenticate the Wrangler CLI itself; they are NOT Worker bindings. You
-# normally export them in your shell/CI rather than keeping them in .dev.vars.
-# predeploy-validate uses CLOUDFLARE_API_TOKEN to decide whether to check remote secrets.
-#CLOUDFLARE_API_TOKEN=your-cloudflare-api-token
-#CLOUDFLARE_ACCOUNT_ID=your-cloudflare-account-id
