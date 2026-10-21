@@ -12,7 +12,7 @@ import { useTurnstileChallenge } from '@/lib/turnstile'
 import { cn } from '@/lib/utils'
 import { fitAssessmentSuccessResponseSchema, type FitAssessmentResult } from '@shared/fit-analysis'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { AlertTriangle, Info, Loader2, RefreshCw, Search, Sparkles, Target } from 'lucide-react'
+import { AlertTriangle, FileText, Loader2, RefreshCw, Target } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -20,9 +20,6 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const FIT_RESULT_SCROLL_TOP_OFFSET_PX = 96
 const FIT_RESULT_SCROLL_FOCUS_THRESHOLD_RATIO = 0.45
 
-// The assessment is a single model pass; these describe the passes it makes over
-// the posting, not deterministic backend progress. The highlight advances on a
-// timer to keep the wait legible without claiming to know real completion.
 const ANALYSIS_STAGES = [
   'Preparing the posting',
   'Checking must-have requirements',
@@ -31,6 +28,21 @@ const ANALYSIS_STAGES = [
   'Forming an honest verdict',
 ] as const
 const ANALYSIS_STAGE_INTERVAL_MS = 2500
+
+const JD_PRESETS = [
+  {
+    label: 'Machine Learning Engineer',
+    text: 'Looking for a Machine Learning Engineer to develop and deploy multimodal models across computer vision and audio signals. Requirements: Strong experience in PyTorch, Python, model optimization, sensor fusion, Docker containerization, and shipping models to production.',
+  },
+  {
+    label: 'Edge AI Specialist',
+    text: 'Seeking an Edge AI Engineer experienced in lightweight on-device inference. Must have hands-on experience with post-training INT8 quantization, LiteRT/TensorFlow Lite, embedded Linux/Android deployments, and optimizing neural network latency under 30ms on constrained hardware.',
+  },
+  {
+    label: 'MLOps & Simulation',
+    text: 'Hiring an MLOps Engineer to build automated training, evaluation, and simulation pipelines. Experience with robotics simulators (NVIDIA Isaac Sim / Isaac Lab), reinforcement learning, containerized environments, and CI/CD pipelines for autonomous drone systems required.',
+  },
+]
 
 function FitAnalyzingPanel() {
   const prefersReducedMotion = useReducedMotion()
@@ -44,21 +56,23 @@ function FitAnalyzingPanel() {
   }, [])
 
   return (
-    <Card className="border-2 overflow-hidden border-blue-600/20 bg-blue-50/5 dark:bg-blue-900/5 glass-darker">
-      <CardHeader className="flex flex-row items-center justify-between gap-3 border-b py-4 bg-blue-50/50 dark:bg-blue-900/20">
-        <div className="flex min-w-0 items-center gap-2">
+    <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 shadow-sm overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between gap-3 border-b py-3.5 px-6 bg-zinc-50 dark:bg-zinc-900">
+        <div className="flex min-w-0 items-center gap-2.5">
           <Loader2
             className={cn(
-              'w-5 h-5 shrink-0 text-blue-600',
+              'w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400',
               !prefersReducedMotion && 'animate-spin'
             )}
             aria-hidden="true"
           />
-          <CardTitle className="truncate text-lg">Assessing fit</CardTitle>
+          <CardTitle className="truncate text-sm sm:text-base font-semibold">
+            Assessing Role Fit
+          </CardTitle>
         </div>
-        <div className="meta-label shrink-0">Usually 5&ndash;15s</div>
+        <div className="meta-label text-zinc-500 dark:text-zinc-400">Usually 5–15s</div>
       </CardHeader>
-      <CardContent className="p-6 md:p-8 space-y-7">
+      <CardContent className="p-6 md:p-8 space-y-6">
         <div className="space-y-4">
           <p className="sr-only" role="status" aria-live="polite">
             {ANALYSIS_STAGES[stageIndex]}
@@ -71,22 +85,25 @@ function FitAnalyzingPanel() {
                 <li key={stage} className="flex items-center gap-3">
                   <span
                     className={cn(
-                      'flex size-2.5 shrink-0 rounded-full transition-colors duration-500',
+                      'flex size-2 shrink-0 rounded-full transition-colors duration-300',
                       isActive
-                        ? cn('bg-blue-500', !prefersReducedMotion && 'animate-pulse')
+                        ? cn(
+                            'bg-blue-600 dark:bg-blue-400',
+                            !prefersReducedMotion && 'animate-pulse'
+                          )
                         : isPast
-                          ? 'bg-blue-400/70'
-                          : 'bg-slate-300 dark:bg-slate-700'
+                          ? 'bg-zinc-400 dark:bg-zinc-500'
+                          : 'bg-zinc-200 dark:bg-zinc-800'
                     )}
                   />
                   <span
                     className={cn(
-                      'text-sm transition-colors duration-500',
+                      'text-sm transition-colors duration-300',
                       isActive
                         ? 'font-semibold text-foreground'
                         : isPast
                           ? 'text-muted-foreground'
-                          : 'text-muted-foreground/60'
+                          : 'text-muted-foreground/50'
                     )}
                   >
                     {stage}
@@ -95,49 +112,10 @@ function FitAnalyzingPanel() {
               )
             })}
           </ol>
-          <p className="text-sm leading-6 text-muted-foreground">
+          <p className="text-sm leading-relaxed text-muted-foreground pt-1">
             Weighing your job description against documented resume evidence &mdash; matches, gaps,
             and honest disqualifiers included.
           </p>
-        </div>
-
-        <div aria-hidden="true" className="space-y-6 border-t border-border/70 pt-6">
-          <div className="grid gap-5 sm:grid-cols-2">
-            {[0, 1].map((column) => (
-              <div key={column} className="space-y-2.5">
-                <div
-                  className={cn(
-                    'h-3 w-24 rounded-full bg-slate-200 dark:bg-slate-800',
-                    !prefersReducedMotion && 'animate-pulse'
-                  )}
-                />
-                <div
-                  className={cn(
-                    'h-2 w-full rounded-full bg-slate-200/70 dark:bg-slate-800/70',
-                    !prefersReducedMotion && 'animate-pulse'
-                  )}
-                />
-                <div
-                  className={cn(
-                    'h-2 w-4/5 rounded-full bg-slate-200/70 dark:bg-slate-800/70',
-                    !prefersReducedMotion && 'animate-pulse'
-                  )}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="space-y-3">
-            {['w-full', 'w-11/12', 'w-3/4'].map((width) => (
-              <div
-                key={width}
-                className={cn(
-                  'h-2.5 rounded-full bg-slate-200/70 dark:bg-slate-800/70',
-                  width,
-                  !prefersReducedMotion && 'animate-pulse'
-                )}
-              />
-            ))}
-          </div>
         </div>
       </CardContent>
     </Card>
@@ -184,8 +162,6 @@ export function FitAssessment() {
     setAnalysisError(null)
 
     try {
-      // The shared human check gates the request; the lease cookie then rides
-      // the same-origin fetch, so no per-request token header is needed.
       const verified = await requestChallenge()
       if (!verified) {
         setAnalysisError({ message: 'Complete the human check and try again.', canRetry: true })
@@ -219,7 +195,6 @@ export function FitAssessment() {
           status: response.status,
           payload,
         })
-        // A rejected lease (403) means the server wants a fresh human check.
         if (response.status === 403) {
           reportChallengeRejected()
         }
@@ -259,54 +234,81 @@ export function FitAssessment() {
   }
 
   return (
-    <section id="fit-check" className="scroll-mt-24" aria-labelledby="fit-check-title">
-      <div className="space-y-9">
-        <div className="max-w-2xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800">
-            <Target className="w-3.5 h-3.5 text-blue-600" aria-hidden="true" />
-            <span className="meta-label text-blue-600 dark:text-blue-400">Recruiter Tool</span>
+    <section id="fit-check" className="scroll-mt-24 w-full" aria-labelledby="fit-check-title">
+      <div className="space-y-8">
+        {/* Section Header */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center border border-blue-200/80 dark:border-blue-900/60">
+              <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+            </div>
+            <div>
+              <h2
+                id="fit-check-title"
+                className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground"
+              >
+                Job Fit Assessment
+              </h2>
+              <p className="meta-label mt-0.5 text-zinc-500">Recruiter Evaluation Tool</p>
+            </div>
           </div>
-          <h2 id="fit-check-title" className="text-3xl md:text-4xl font-bold tracking-tight">
-            Job Fit Assessment
-          </h2>
-          <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
-            Paste a job description for a direct read on strengths and any gaps or hard blockers
-            &mdash; not just the positive matches.
+          <p className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-2xl pt-1">
+            Paste a job description for an objective read on role overlap, verifiable technical
+            evidence, and honest gap reporting.
           </p>
         </div>
 
-        <Card className="border-2 border-slate-200 dark:border-slate-800 glass shadow-xl overflow-hidden">
-          <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b space-y-3.5">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2 uppercase tracking-wider">
-              <Search className="w-4 h-4" aria-hidden="true" />
-              Job Description Input
-            </CardTitle>
-            <CardDescription className="text-xs md:text-sm inline-flex items-start gap-2 leading-relaxed">
-              <Info
-                className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0"
-                aria-hidden="true"
-              />
-              Include required skills, years of experience, and domain constraints for a more useful
-              assessment.
-            </CardDescription>
+        {/* Input Card */}
+        <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-sm overflow-hidden">
+          <CardHeader className="bg-zinc-50/70 dark:bg-zinc-900/60 border-b border-zinc-200 dark:border-zinc-800 py-4 px-5 sm:px-6">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                <FileText className="w-4 h-4 text-zinc-500" aria-hidden="true" />
+                Job Posting Input
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">
+                Include requirements & constraints
+              </CardDescription>
+            </div>
           </CardHeader>
 
-          <CardContent className="p-5 md:p-6">
-            <form onSubmit={handleAnalyze} className="space-y-6" aria-busy={isAnalyzing}>
-              <div className="space-y-2">
-                <label htmlFor="fit-jd-input" className="text-sm font-medium">
-                  Job description
+          <CardContent className="p-5 sm:p-6 space-y-5">
+            {/* Presets Row */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Quick sample roles:</p>
+              <div className="flex flex-wrap gap-2">
+                {JD_PRESETS.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setJd(preset.text)}
+                    className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100/80 dark:bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors cursor-pointer"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Input Form */}
+            <form onSubmit={handleAnalyze} className="space-y-5" aria-busy={isAnalyzing}>
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="fit-jd-input"
+                  className="text-xs font-semibold text-foreground uppercase tracking-wider"
+                >
+                  Job Description Text
                 </label>
                 <Textarea
                   id="fit-jd-input"
-                  placeholder="Example: We are hiring a Senior Software Engineer with strong backend, API design, and cloud infrastructure experience, plus a track record of shipping and owning production systems..."
-                  className="min-h-[220px] font-sans text-sm resize-y bg-background/50"
+                  placeholder="Paste the full job posting requirements here..."
+                  className="min-h-[180px] font-sans text-sm resize-y rounded-lg border-zinc-200 dark:border-zinc-700 bg-background text-foreground focus:ring-1 focus:ring-blue-500"
                   value={jd}
                   onChange={(e) => setJd(e.target.value)}
                   aria-describedby="fit-jd-help"
                 />
                 <p id="fit-jd-help" className="text-xs text-muted-foreground">
-                  Tip: paste the full posting including must-have and nice-to-have requirements.
+                  Paste the responsibilities, must-haves, and qualifications for the role.
                 </p>
               </div>
 
@@ -314,7 +316,7 @@ export function FitAssessment() {
                 <Button
                   type="submit"
                   disabled={isAnalyzing || !jd.trim()}
-                  className="btn-gradient px-8 rounded-full h-11 text-white hover:text-white dark:text-white dark:hover:text-white"
+                  className="btn-gradient px-6 rounded-lg h-10 text-sm font-medium cursor-pointer"
                 >
                   {isAnalyzing ? (
                     <>
@@ -324,10 +326,7 @@ export function FitAssessment() {
                       Analyzing Fit...
                     </>
                   ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Calculate Fit Score
-                    </>
+                    'Calculate Fit Score'
                   )}
                 </Button>
               </div>
@@ -335,28 +334,30 @@ export function FitAssessment() {
           </CardContent>
         </Card>
 
+        {/* Results Panel */}
         <AnimatePresence mode="wait">
           {(isAnalyzing || result || analysisError) && (
             <motion.div
               key={isAnalyzing ? 'analyzing' : analysisError ? 'error' : 'result'}
               ref={fitResultRef}
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20 }}
-              className="scroll-mt-24 mt-12"
+              exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -16 }}
+              className="scroll-mt-24 mt-8"
             >
               {isAnalyzing ? (
                 <FitAnalyzingPanel />
               ) : analysisError ? (
-                <Card className="border-2 overflow-hidden border-amber-500/30 bg-amber-50/5 dark:bg-amber-900/10 glass">
-                  <CardHeader className="flex flex-row items-center justify-between gap-3 border-b py-4 bg-amber-50/60 dark:bg-amber-900/20">
+                <Card className="rounded-xl border border-amber-500/30 bg-amber-50/10 dark:bg-amber-950/20 shadow-sm overflow-hidden">
+                  <CardHeader className="flex flex-row items-center justify-between gap-3 border-b py-3.5 px-6 bg-amber-50/50 dark:bg-amber-950/30">
                     <div className="flex min-w-0 items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 shrink-0 text-amber-600" />
-                      <CardTitle className="truncate text-lg">Analysis Failed</CardTitle>
+                      <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
+                      <CardTitle className="truncate text-sm sm:text-base font-semibold">
+                        Analysis Failed
+                      </CardTitle>
                     </div>
-                    <div className="meta-label hidden shrink-0 sm:block">Attention Required</div>
                   </CardHeader>
-                  <CardContent className="p-6 md:p-8 space-y-4" role="alert" aria-live="polite">
+                  <CardContent className="p-6 space-y-4" role="alert" aria-live="polite">
                     <p className="text-sm font-medium">{analysisError.message}</p>
                     {analysisError.canRetry && (
                       <Button
@@ -365,12 +366,12 @@ export function FitAssessment() {
                         size="sm"
                         onClick={retryAnalysis}
                         disabled={isAnalyzing || !jd.trim()}
-                        className="rounded-full w-fit text-sm"
+                        className="rounded-lg w-fit text-xs font-medium"
                       >
                         {isAnalyzing ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
                         ) : (
-                          <RefreshCw className="w-4 h-4 mr-2" />
+                          <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
                         )}
                         Retry analysis
                       </Button>

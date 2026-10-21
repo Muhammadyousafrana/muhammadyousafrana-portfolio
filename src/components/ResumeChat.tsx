@@ -1,8 +1,9 @@
 import type { ChatClearBridge } from '@/components/chat/ResumeChatDialog'
 import { ResumeChatDialogShell } from '@/components/chat/ResumeChatDialogShell'
 import { Button } from '@/components/ui/button'
+import { resumeViewModel } from '@/data/resume'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Loader2, MessageSquare, Trash2 } from 'lucide-react'
+import { Bot, Loader2, Sparkles, Trash2 } from 'lucide-react'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -22,21 +23,13 @@ const LazyResumeChatDialogBody = lazy(loadResumeChatDialog)
 export function ResumeChat() {
   const prefersReducedMotion = useReducedMotion()
   const [isOpen, setIsOpen] = useState(false)
-  // Sticky after the first open: the chat mounts lazily once, then only ever
-  // hides via CSS (see ResumeChatDialogShell) so an in-flight reply keeps
-  // streaming while the panel is hidden.
   const [shouldRenderChat, setShouldRenderChat] = useState(false)
-  // Assistant content arrived while the panel was hidden; cleared on open.
   const [hasUnread, setHasUnread] = useState(false)
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   const openButtonRef = useRef<HTMLButtonElement>(null)
   const wasOpenRef = useRef(false)
 
-  // The Clear button lives in the persistent shell header (which never
-  // remounts), but its handler + disabled state come from the lazy body, which
-  // may suspend. Keep the handler in a ref (avoids per-render parent churn) and
-  // mirror only ready/disabled into state for the button.
   const clearHandlerRef = useRef<(() => void) | null>(null)
   const [clearReady, setClearReady] = useState(false)
   const [clearDisabled, setClearDisabled] = useState(true)
@@ -62,10 +55,6 @@ export function ResumeChat() {
     setPortalContainer(document.body)
   }, [])
 
-  // Non-modal focus management: on open, move focus into the panel unless the
-  // body already claimed it (it focuses the input once loaded — the fallback
-  // here covers the lazy/Suspense window and a security-gated disabled input).
-  // On close-from-within (close button / Escape), return focus to the trigger.
   useEffect(() => {
     if (!isOpen) {
       if (wasOpenRef.current) {
@@ -96,9 +85,6 @@ export function ResumeChat() {
     setHasUnread(false)
     preloadDialog()
     if (isOpen) {
-      // Already open (desktop keeps the trigger visible beside the panel):
-      // the trigger acts as a focus shortcut instead of a toggle — only the
-      // close button and Escape hide the panel.
       dialogRef.current?.focus()
       return
     }
@@ -112,17 +98,13 @@ export function ResumeChat() {
   return (
     <>
       <motion.div
-        initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{
           duration: prefersReducedMotion ? 0 : 0.35,
           delay: prefersReducedMotion ? 0 : 0.35,
         }}
-        // Stays mounted while the panel is open (stable aria-expanded target +
-        // focus-return target). On mobile the open bottom sheet would cover
-        // it, so hide it there rather than leaving a focusable control under
-        // the panel; on desktop the panel docks above it and it stays usable.
-        className={`fixed bottom-4 left-4 right-4 z-50 sm:left-auto sm:right-6 sm:w-auto ${
+        className={`fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 ${
           isOpen ? 'invisible pointer-events-none sm:visible sm:pointer-events-auto' : ''
         }`}
       >
@@ -131,7 +113,7 @@ export function ResumeChat() {
           onClick={openPanel}
           onPointerEnter={preloadDialog}
           onFocus={preloadDialog}
-          className="btn-gradient relative h-12 w-full rounded-2xl border-2 border-white/20 px-4 shadow-2xl !text-white hover:!text-white hover:shadow-blue-600/20 sm:h-14 sm:w-auto sm:rounded-full sm:px-5"
+          className="btn-gradient relative h-11 sm:h-12 rounded-full border border-white/30 px-3.5 sm:px-4.5 shadow-xl !text-white hover:!text-white hover:shadow-blue-500/35 flex items-center gap-2 backdrop-blur-xl group cursor-pointer"
           aria-label={
             isOpen
               ? 'Focus portfolio AI chat'
@@ -143,20 +125,20 @@ export function ResumeChat() {
           aria-haspopup="dialog"
           aria-expanded={isOpen}
         >
-          <motion.span
-            animate={
-              prefersReducedMotion ? undefined : { scale: [1, 1.08, 1], opacity: [1, 0.9, 1] }
-            }
-            transition={
-              prefersReducedMotion
-                ? undefined
-                : { duration: 2.8, repeat: Infinity, repeatDelay: 1.6, ease: 'easeInOut' }
-            }
-            className="inline-flex"
-          >
-            <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6" />
-          </motion.span>
-          <span className="text-xs font-semibold sm:text-sm">Ask my AI about my experience</span>
+          {/* Active Status Pulse */}
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+          </span>
+
+          <Bot className="size-4.5 text-white/95 transition-transform duration-300 group-hover:scale-110" />
+
+          <span className="text-xs sm:text-sm font-semibold tracking-wide">
+            Ask {resumeViewModel.assistantName || 'Robo-Yousaf'}
+          </span>
+
+          <Sparkles className="size-3 text-cyan-300 animate-pulse ml-0.5" />
+
           {hasUnread && (
             <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-3 w-3">
               {!prefersReducedMotion && (
@@ -189,9 +171,6 @@ export function ResumeChat() {
               </Button>
             }
           >
-            {/* Only the body's initial code-split load suspends here (useChat
-                itself never suspends); the shell above stays mounted, so its
-                enter animation runs once. */}
             <Suspense
               fallback={
                 <div className="flex flex-1 items-center justify-center bg-background/60 p-6">

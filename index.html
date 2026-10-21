@@ -17,13 +17,41 @@
       })()
     </script>
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- SEO & Indexing Directives -->
+    <meta name="author" content="Muhammad Yousaf Rana" />
+    <meta name="publisher" content="Muhammad Yousaf Rana" />
+    <meta name="creator" content="Muhammad Yousaf Rana" />
+    <meta
+      name="keywords"
+      content="Muhammad Yousaf Rana, Yousaf Rana, AI Engineer, Machine Learning Engineer, Edge AI Engineer, MLOps Engineer, Computer Vision, Audio Machine Learning, Multimodal Sensor Fusion, LiteRT, INT8 Quantization, NVIDIA Isaac Sim, PyTorch, TensorFlow, LoRA Fine-Tuning, Parameter-Efficient Fine-Tuning, DroneWatch, Autonomous Systems"
+    />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="googlebot"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+    <meta
+      name="bingbot"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+    <meta name="application-name" content="Muhammad Yousaf Rana Portfolio" />
+    <meta name="apple-mobile-web-app-title" content="Yousaf Rana AI" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
     <!-- SEO/social tags below are injected from content/portfolio.yaml (the seo
          block) by the transformIndexHtml hook in vite.config.ts; the placeholder
          tokens are replaced at dev-serve and build time. -->
     <meta name="description" content="{{SEO_DESCRIPTION}}" />
     <meta name="theme-color" content="{{SEO_THEME_COLOR}}" />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="Muhammad Yousaf Rana | AI Engineer Portfolio" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content="{{SEO_OG_TITLE}}" />
     <meta property="og:description" content="{{SEO_OG_DESCRIPTION}}" />
     <meta property="og:image" content="/ai-engineer-social-banner.svg" />
@@ -38,7 +66,92 @@
     <meta name="twitter:title" content="{{SEO_OG_TITLE}}" />
     <meta name="twitter:description" content="{{SEO_OG_DESCRIPTION}}" />
     <meta name="twitter:image" content="/ai-engineer-social-banner.svg" />
+    <meta
+      name="twitter:image:alt"
+      content="Muhammad Yousaf Rana, AI Engineer focused on multimodal systems, MLOps, and edge inference"
+    />
     <title>{{SEO_TITLE}}</title>
+
+    <!-- Schema.org Structured Data (JSON-LD) for Search Engine Rich Snippets -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://muhammadyousafrana.pages.dev/#person",
+            "name": "Muhammad Yousaf Rana",
+            "alternateName": ["Yousaf Rana", "Robo-Yousaf"],
+            "jobTitle": "AI Engineer",
+            "description": "AI Engineer building multimodal machine-learning systems across computer vision, audio, generative modeling, MLOps, and edge inference.",
+            "image": "/profile.png",
+            "email": "mailto:yousaf.mlengineer@gmail.com",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Islamabad",
+              "addressCountry": "PK"
+            },
+            "alumniOf": {
+              "@type": "EducationalOrganization",
+              "name": "University of Engineering and Technology Taxila (UET Taxila)",
+              "sameAs": "https://www.uettaxila.edu.pk/"
+            },
+            "knowsAbout": [
+              "Artificial Intelligence",
+              "Machine Learning",
+              "Deep Learning",
+              "Multimodal Sensor Fusion",
+              "Computer Vision",
+              "Audio Machine Learning",
+              "Edge AI",
+              "LiteRT",
+              "INT8 Quantization",
+              "MLOps",
+              "NVIDIA Isaac Sim",
+              "PyTorch",
+              "TensorFlow",
+              "Parameter-Efficient Fine-Tuning (PEFT)",
+              "Low-Rank Adaptation (LoRA)",
+              "Robotics Autonomy"
+            ],
+            "sameAs": [
+              "https://github.com/Muhammadyousafrana",
+              "https://www.linkedin.com/in/muhammad-yousaf-rana-a96637234/",
+              "https://www.kaggle.com/josephengineer112",
+              "https://huggingface.co/MYousafRana",
+              "https://www.credly.com/users/mohammad-yousaf-rana",
+              "https://me.developers.google.com/u/yousafrana"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://muhammadyousafrana.pages.dev/#website",
+            "url": "https://muhammadyousafrana.pages.dev/",
+            "name": "Muhammad Yousaf Rana | AI Engineer Portfolio",
+            "description": "Portfolio of Muhammad Yousaf Rana, an AI Engineer specializing in multimodal systems, computer vision, audio ML, MLOps, and on-device edge AI.",
+            "publisher": {
+              "@id": "https://muhammadyousafrana.pages.dev/#person"
+            },
+            "inLanguage": "en-US"
+          },
+          {
+            "@type": "ProfilePage",
+            "@id": "https://muhammadyousafrana.pages.dev/#profilepage",
+            "url": "https://muhammadyousafrana.pages.dev/",
+            "name": "Muhammad Yousaf Rana | AI Engineer",
+            "isPartOf": {
+              "@id": "https://muhammadyousafrana.pages.dev/#website"
+            },
+            "about": {
+              "@id": "https://muhammadyousafrana.pages.dev/#person"
+            },
+            "mainEntity": {
+              "@id": "https://muhammadyousafrana.pages.dev/#person"
+            }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

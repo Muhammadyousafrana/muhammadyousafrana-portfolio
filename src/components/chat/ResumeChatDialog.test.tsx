@@ -1,7 +1,8 @@
 /* eslint-disable import/no-unresolved */
 import { resumeViewModel } from '@/data/resume'
+import { setTemperatureUnit } from '@/lib/temperature-unit'
 import { CHAT_TOOL_NAME } from '@shared/chat-tools'
-import { describe, expect, it, mock } from 'bun:test'
+import { beforeEach, describe, expect, it, mock } from 'bun:test'
 import type { ComponentProps } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { AssistantMessageContent } from './ResumeChatDialog'
@@ -25,6 +26,12 @@ const createContext = (overrides?: Partial<ComponentProps<typeof AssistantMessag
 })
 
 describe('AssistantMessageContent', () => {
+  beforeEach(() => {
+    setTemperatureUnit('C')
+    if (typeof localStorage !== 'undefined') {
+      localStorage.clear()
+    }
+  })
   it('renders assistant markdown even when contact tool parts exist on the same message', () => {
     const markup = renderToStaticMarkup(
       <AssistantMessageContent

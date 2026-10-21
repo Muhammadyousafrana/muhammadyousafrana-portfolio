@@ -1,75 +1,99 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 50%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 44%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 45%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 50%;
-    --radius: 1rem;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.75rem;
   }
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 64%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 5.5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 5.5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 45%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 60%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 }
+
 @layer components {
+  /* Polished, Professional Button */
   .btn-gradient {
-    @apply bg-blue-600 text-white transition-all duration-300 hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%);
+    @apply bg-blue-600 text-white font-medium transition-all duration-200 hover:bg-blue-700 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   }
+
+  /* Refined Glass */
   .glass {
-    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/50;
+    @apply bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800/80;
   }
   .glass-darker {
-    @apply bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-2xl border border-slate-200 dark:border-slate-800;
+    @apply bg-zinc-50/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800;
   }
+
+  /* Clean Professional Surface Card */
+  .tech-card {
+    @apply rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 transition-all duration-200;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  }
+  .tech-card:hover {
+    @apply border-zinc-300 dark:border-zinc-700 shadow-sm;
+  }
+
+  /* Micro Grid (subtle, clean, not distracting) */
+  .tech-grid-bg {
+    background-color: hsl(var(--background));
+  }
+
+  /* High-Contrast Telemetry Badge */
+  .telemetry-tag {
+    @apply inline-flex items-center gap-1.5 font-mono text-[11px] font-medium tracking-wide uppercase px-2.5 py-1 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300;
+  }
+
   .meta-label {
-    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground;
+    @apply text-[11px] font-semibold uppercase tracking-wider text-muted-foreground;
     line-height: 1.2;
   }
   .date-pill {
-    @apply inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[12px] font-semibold text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200;
+    @apply inline-flex items-center rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-100/80 dark:bg-zinc-800/80 px-2.5 py-0.5 text-[11px] font-medium text-zinc-600 dark:text-zinc-300;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.01em;
-    line-height: 1.1;
   }
   .mono-token {
     @apply font-mono text-[0.92em];
   }
+
   /* Markdown Content Reset & Styling */
   .markdown-content p {
     @apply mb-3 last:mb-0 leading-[1.7];
@@ -81,21 +105,23 @@
     @apply text-sm;
   }
   .markdown-content strong {
-    @apply font-bold text-foreground;
+    @apply font-semibold text-foreground;
   }
   .markdown-content h1,
   .markdown-content h2,
   .markdown-content h3 {
-    @apply font-bold tracking-tight mb-2 mt-4 first:mt-0;
+    @apply font-semibold tracking-tight mb-2 mt-4 first:mt-0;
   }
   .markdown-content h3 {
     @apply text-base;
   }
+
   /* Chat Specific Markdown */
   .chat-bubble code {
-    @apply font-mono text-[11px] bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-blue-600 dark:text-blue-400;
+    @apply font-mono text-[11px] bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded text-blue-600 dark:text-blue-400;
   }
 }
+
 @layer base {
   * {
     @apply border-border;
@@ -107,6 +133,7 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
   @media (prefers-reduced-motion: reduce) {
     html {

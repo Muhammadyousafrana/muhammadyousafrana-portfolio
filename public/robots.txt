@@ -1,0 +1,9 @@
+# Robots.txt for Muhammad Yousaf Rana AI Portfolio
+# https://github.com/Muhammadyousafrana
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Sitemaps
+Sitemap: /sitemap.xml

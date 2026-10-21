@@ -1,7 +1,8 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { resumeViewModel } from '@/data/resume'
-import { GraduationCap, Hammer, Star } from 'lucide-react'
+import { Compass, Hammer, Sparkles, Star } from 'lucide-react'
+
 export function SkillsMatrix() {
   const { coreStrengths, appliedAndDeveloping, currentLearningFocus } = resumeViewModel.skills
 
@@ -15,23 +16,30 @@ export function SkillsMatrix() {
   }
 
   return (
-    <section
-      id="skills"
-      className="relative left-1/2 w-[calc(100vw-2rem)] max-w-[80rem] -translate-x-1/2 scroll-mt-24"
-      aria-labelledby="skills-title"
-    >
-      <div className="mb-12 md:mb-14 space-y-3">
-        <h2 id="skills-title" className="text-3xl md:text-4xl font-bold tracking-tight">
-          Technical Competencies
-        </h2>
-        <p className="meta-label">Core strengths, applied tools, and current learning focus</p>
+    <section id="skills" className="scroll-mt-24 w-full" aria-labelledby="skills-title">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="size-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
+          <Sparkles className="w-5 h-5 text-zinc-600 dark:text-zinc-300" aria-hidden="true" />
+        </div>
+        <div>
+          <h2
+            id="skills-title"
+            className="text-xl sm:text-2xl font-bold tracking-tight text-foreground"
+          >
+            Technical Competencies
+          </h2>
+          <p className="meta-label mt-0.5 text-zinc-500">
+            Core strengths, applied tools, and current learning focus
+          </p>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-7">
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {coreStrengths.length > 0 && (
-          <Card className="border-2 border-blue-200 bg-blue-50/70 dark:border-blue-800/60 dark:bg-blue-950/30">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
-                <Star className="w-5 h-5" />
+          <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <CardHeader className="pb-3.5">
+              <CardTitle className="flex items-center gap-2 text-foreground text-sm font-bold">
+                <Star className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 Core Strengths
               </CardTitle>
             </CardHeader>
@@ -40,7 +48,7 @@ export function SkillsMatrix() {
                 <Badge
                   key={skill}
                   variant="outline"
-                  className="border-blue-300 bg-blue-100 text-blue-900 shadow-sm hover:bg-blue-200 dark:border-blue-700 dark:bg-blue-900/50 dark:text-blue-100 dark:hover:bg-blue-900/70"
+                  className="rounded-md border-blue-200/80 bg-blue-50/60 text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300 px-2.5 py-1 text-xs font-medium shadow-none"
                 >
                   {skill}
                 </Badge>
@@ -48,11 +56,12 @@ export function SkillsMatrix() {
             </CardContent>
           </Card>
         )}
+
         {appliedAndDeveloping.length > 0 && (
-          <Card className="border-2 border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/60">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                <Hammer className="w-5 h-5" />
+          <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <CardHeader className="pb-3.5">
+              <CardTitle className="flex items-center gap-2 text-foreground text-sm font-bold">
+                <Hammer className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                 Applied / Developing
               </CardTitle>
             </CardHeader>
@@ -61,7 +70,7 @@ export function SkillsMatrix() {
                 <Badge
                   key={skill}
                   variant="outline"
-                  className="border-slate-300 bg-white text-slate-800 shadow-sm hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                  className="rounded-md border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-800 dark:text-zinc-200 px-2.5 py-1 text-xs font-medium shadow-none hover:bg-zinc-100 dark:hover:bg-zinc-700/60 transition-colors"
                 >
                   {skill}
                 </Badge>
@@ -69,11 +78,12 @@ export function SkillsMatrix() {
             </CardContent>
           </Card>
         )}
+
         {currentLearningFocus.length > 0 && (
-          <Card className="border-2 border-sky-200 bg-sky-50/70 dark:border-sky-800/60 dark:bg-sky-950/25">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-sky-800 dark:text-sky-200">
-                <GraduationCap className="w-5 h-5" />
+          <Card className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <CardHeader className="pb-3.5">
+              <CardTitle className="flex items-center gap-2 text-foreground text-sm font-bold">
+                <Compass className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                 Growth Areas
               </CardTitle>
             </CardHeader>
@@ -82,7 +92,7 @@ export function SkillsMatrix() {
                 <Badge
                   key={skill}
                   variant="outline"
-                  className="border-sky-300 bg-white text-sky-800 shadow-sm hover:bg-sky-100 dark:border-sky-700 dark:bg-sky-900/45 dark:text-sky-100 dark:hover:bg-sky-800/60"
+                  className="rounded-md border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-800 dark:text-zinc-200 px-2.5 py-1 text-xs font-medium shadow-none hover:bg-zinc-100 dark:hover:bg-zinc-700/60 transition-colors"
                 >
                   {skill}
                 </Badge>

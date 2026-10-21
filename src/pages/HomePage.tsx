@@ -9,103 +9,126 @@ import { SkillsMatrix } from '@/components/SkillsMatrix'
 import { Button } from '@/components/ui/button'
 import { resumeViewModel } from '@/data/resume'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Bot, Briefcase, CheckCircle2, Cpu, Linkedin, MapPin, Target } from 'lucide-react'
+import {
+  Briefcase,
+  CheckCircle2,
+  Cpu,
+  GraduationCap,
+  Layers,
+  Linkedin,
+  MapPin,
+  Target,
+} from 'lucide-react'
 
 export function HomePage() {
   const prefersReducedMotion = useReducedMotion()
   const { contact, homepage, firstName } = resumeViewModel
   const hasProofPoints = homepage.proofPoints.length > 0
   const hasExperience = resumeViewModel.experience.length > 0
-  const spotlightCardSurfaceClassName =
-    'bg-gradient-to-br from-slate-900 to-blue-900 dark:from-slate-950 dark:to-blue-950 text-white relative overflow-hidden shadow-2xl'
-  const spotlightPrimaryGlowClassName =
-    'absolute top-0 right-0 w-80 h-80 bg-blue-600/20 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2'
-  const spotlightSecondaryGlowClassName =
-    'absolute bottom-0 left-0 w-64 h-64 bg-indigo-600/10 blur-[80px] rounded-full -translate-x-1/2 translate-y-1/2'
 
   return (
-    <div className="min-h-screen bg-background selection:bg-blue-100 dark:selection:bg-blue-900">
+    <div className="min-h-screen bg-background selection:bg-blue-500/20 text-foreground">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="py-8 md:py-12 lg:py-0 lg:min-h-[calc(100svh-4rem)] lg:flex lg:items-center mb-8 md:mb-10 lg:mb-0">
+
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* ============================================================== */}
+        {/* HERO SECTION                                                    */}
+        {/* ============================================================== */}
+        <div className="py-14 sm:py-20 lg:py-24 border-b border-zinc-200 dark:border-zinc-800 mb-16">
           <section
             id="hero-fold"
-            className={`w-full grid gap-8 md:gap-10 lg:gap-8 lg:items-center ${
+            className={`w-full grid gap-12 lg:gap-12 lg:items-start ${
               hasProofPoints ? 'lg:grid-cols-[1.15fr_0.85fr]' : ''
             }`}
           >
+            {/* Left Column: Mission Pitch */}
             <motion.div
               initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: prefersReducedMotion ? 0 : 0.6 }}
-              className="space-y-7 md:space-y-8 lg:space-y-6 text-center lg:text-left lg:pr-4 xl:pr-6"
+              transition={{ duration: prefersReducedMotion ? 0 : 0.5 }}
+              className="space-y-6 text-left"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                </span>
-                <span className="meta-label text-blue-600 dark:text-blue-400">
+              {/* Status Chip */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80">
+                <span className="size-2 rounded-full bg-emerald-500" />
+                <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                   {homepage.openToLabel}
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight max-w-4xl lg:mx-0 mx-auto leading-[0.95]">
-                {homepage.heroHeadline}
-              </h1>
-
-              <p className="text-base md:text-lg text-muted-foreground max-w-2xl lg:mx-0 mx-auto leading-relaxed">
-                {resumeViewModel.summary}
-              </p>
-
-              <div className="grid gap-3 grid-cols-1 min-[560px]:grid-cols-3 lg:max-w-[42rem]">
-                <div className="min-w-0 rounded-xl border border-blue-100 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-900/10 p-3">
-                  <p className="meta-label text-blue-700 dark:text-blue-300">Role Focus</p>
-                  <p className="text-sm mt-1 font-medium leading-snug">{homepage.roleFocus}</p>
+              {/* Title & Headline */}
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2">
+                  <span className="text-xs sm:text-sm font-semibold tracking-wide text-blue-600 dark:text-blue-400 uppercase">
+                    {resumeViewModel.name} &bull; AI Engineer
+                  </span>
                 </div>
-                <div className="min-w-0 rounded-xl border border-blue-100 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-900/10 p-3">
-                  <p className="meta-label text-blue-700 dark:text-blue-300">Location</p>
-                  <p className="text-sm mt-1 font-medium inline-flex items-center gap-1.5 leading-snug">
-                    <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                    <span className="min-w-0 break-words">{contact.location}</span>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-[1.12]">
+                  {homepage.heroHeadline}
+                </h1>
+                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed font-normal pt-1">
+                  {resumeViewModel.summary}
+                </p>
+              </div>
+
+              {/* Quick Spec Pills */}
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-3 pt-1">
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-3.5">
+                  <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                    <Layers className="size-3.5" />
+                    <p className="meta-label">Role Focus</p>
+                  </div>
+                  <p className="text-xs sm:text-sm mt-1 font-semibold text-foreground">
+                    {homepage.roleFocus}
                   </p>
                 </div>
-                <div className="min-w-0 rounded-xl border border-blue-100 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-900/10 p-3">
-                  <p className="meta-label text-blue-700 dark:text-blue-300">Education</p>
-                  <p className="text-sm mt-1 font-medium leading-snug">
+
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-3.5">
+                  <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                    <MapPin className="size-3.5" />
+                    <p className="meta-label">Location</p>
+                  </div>
+                  <p className="text-xs sm:text-sm mt-1 font-semibold text-foreground">
+                    {contact.location}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-3.5">
+                  <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                    <GraduationCap className="size-3.5" />
+                    <p className="meta-label">Education</p>
+                  </div>
+                  <p className="text-xs sm:text-sm mt-1 font-semibold text-foreground">
                     {resumeViewModel.education.degree}
                   </p>
                 </div>
               </div>
 
-              <div
-                className={`grid grid-cols-1 gap-2.5 pt-3 md:pt-4 lg:pt-1 max-w-[42rem] mx-auto lg:mx-0 ${
-                  hasExperience ? 'md:grid-cols-3' : 'md:grid-cols-2'
-                }`}
-              >
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 pt-2">
                 <EmailButton
                   email={contact.email}
                   label={`Email ${firstName} directly`}
-                  size="lg"
-                  className="w-full rounded-full px-6 h-12 btn-gradient shadow-xl hover:shadow-blue-500/25 text-sm font-semibold !text-white hover:!text-white"
+                  size="default"
+                  className="rounded-lg px-5 h-11 btn-gradient text-sm font-medium shadow-sm cursor-pointer"
                 />
                 <Button
                   asChild
-                  size="sm"
+                  size="default"
                   variant="outline"
-                  className="w-full rounded-full px-5 h-12 text-sm font-medium"
+                  className="rounded-lg px-4.5 h-11 text-sm font-medium border-zinc-200 dark:border-zinc-700 bg-background hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                 >
                   <a href="#fit-check">
-                    <Target className="w-4 h-4 mr-2" />
+                    <Target className="w-4 h-4 mr-2 text-zinc-500" />
                     Run JD Fit Check
                   </a>
                 </Button>
                 {hasExperience && (
                   <Button
                     asChild
-                    size="sm"
-                    variant="outline"
-                    className="w-full rounded-full px-5 h-12 text-sm font-medium"
+                    size="default"
+                    variant="ghost"
+                    className="rounded-lg px-4.5 h-11 text-sm font-medium text-muted-foreground hover:text-foreground"
                   >
                     <a href="#experience">
                       <Briefcase className="w-4 h-4 mr-2" />
@@ -116,116 +139,138 @@ export function HomePage() {
               </div>
             </motion.div>
 
+            {/* Right Column: Profile & Key Proof Points */}
             {hasProofPoints && (
               <motion.aside
                 initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: prefersReducedMotion ? 0 : 0.7,
-                  delay: prefersReducedMotion ? 0 : 0.15,
+                  duration: prefersReducedMotion ? 0 : 0.6,
+                  delay: prefersReducedMotion ? 0 : 0.1,
                 }}
-                className={`${spotlightCardSurfaceClassName} rounded-3xl border border-slate-300/50 dark:border-slate-800 p-5 md:p-6`}
-                aria-label="Recruiter proof points"
+                className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/40 p-6 sm:p-7 shadow-xs space-y-6"
+                aria-label="Candidate proof points"
               >
-                <div className={spotlightPrimaryGlowClassName} />
-                <div className={spotlightSecondaryGlowClassName} />
-                <div className="relative z-10 space-y-4">
+                {/* Profile Header */}
+                <div className="flex items-center gap-4 border-b border-zinc-200/80 dark:border-zinc-800 pb-5">
                   <img
                     src="/profile.png"
-                    alt="Portrait of Muhammad Yousaf Rana"
-                    className="mx-auto size-32 rounded-full border-4 border-white/20 object-cover object-center shadow-xl"
+                    alt="Portrait of Muhammad Yousaf Rana, AI Engineer"
+                    className="size-16 rounded-full border border-zinc-200 dark:border-zinc-700 object-cover object-center shadow-xs"
                   />
-                  <h2 className="text-xl md:text-2xl font-bold tracking-tight">At a glance</h2>
+                  <div>
+                    <h2 className="text-lg font-bold tracking-tight text-foreground">
+                      {resumeViewModel.name}
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {resumeViewModel.experience[0]?.title ?? 'AI Engineer'} · {contact.location}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Highlights */}
+                <div className="space-y-4">
+                  <p className="meta-label text-zinc-500 dark:text-zinc-400">At A Glance</p>
                   <ul className="space-y-3.5">
                     {homepage.proofPoints.map((proof) => (
                       <li
                         key={proof.sourceId}
-                        className="rounded-xl border border-white/15 bg-white/5 p-3 md:p-4"
+                        className="rounded-xl border border-zinc-200/70 dark:border-zinc-800/80 bg-white dark:bg-zinc-800/60 p-3.5 shadow-2xs"
                       >
-                        <p className="font-semibold text-sm inline-flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                          {proof.title}
+                        <p className="font-semibold text-xs sm:text-sm inline-flex items-center gap-2 text-foreground">
+                          <CheckCircle2 className="size-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                          <span>{proof.title}</span>
                         </p>
-                        <p className="text-xs md:text-sm text-blue-100/90 mt-2 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 leading-relaxed">
                           {proof.detail}
                         </p>
                       </li>
                     ))}
                   </ul>
                 </div>
+
+                {/* Technical Tags */}
+                <div className="pt-2 flex flex-wrap gap-1.5">
+                  {['LiteRT', 'INT8 Quantization', 'Isaac Sim', 'EfficientNetV2', 'GCC-PHAT'].map(
+                    (tech) => (
+                      <span key={tech} className="telemetry-tag text-[10px] py-0.5 px-2">
+                        {tech}
+                      </span>
+                    )
+                  )}
+                </div>
               </motion.aside>
             )}
           </section>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-20 md:space-y-24">
-            <ExperienceFeed />
-            <CredentialHighlights />
-            <SkillsMatrix />
-            <FitAssessment />
-          </div>
+        {/* ============================================================== */}
+        {/* BODY SECTIONS                                                  */}
+        {/* ============================================================== */}
+        <div className="space-y-24">
+          <ExperienceFeed />
+          <CredentialHighlights />
+          <SkillsMatrix />
+          <FitAssessment />
 
-          <section className="py-20 md:py-24">
-            <motion.div
-              initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.95 }}
-              whileInView={prefersReducedMotion ? undefined : { opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className={`${spotlightCardSurfaceClassName} rounded-[2.5rem] p-8 md:p-12 text-center space-y-9`}
-            >
-              <div className={spotlightPrimaryGlowClassName} />
-              <div className={spotlightSecondaryGlowClassName} />
-              <div className="relative z-10 space-y-6">
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  {homepage.ctaHeadline}
-                </h2>
-                <p className="text-blue-200/80 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-                  {homepage.ctaSubtext}
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
-                  <EmailButton
-                    email={contact.email}
-                    label={`Email ${firstName}`}
-                    size="lg"
-                    className="w-full sm:w-auto bg-white text-blue-950 hover:bg-blue-100 hover:text-blue-900 hover:shadow-lg hover:shadow-blue-950/20 rounded-full px-10 h-14 text-base font-semibold transition-all"
-                  />
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="ghost"
-                    className="w-full sm:w-auto text-white hover:text-white hover:bg-white/10 rounded-full h-14 px-8 border border-white/20 text-base font-semibold"
-                  >
-                    <a href={contact.linkedinUrl} target="_blank" rel="noopener noreferrer">
-                      <Linkedin className="w-5 h-5 mr-2" />
-                      Open LinkedIn
-                    </a>
-                  </Button>
-                </div>
+          {/* Bottom Call To Action */}
+          <section className="py-16">
+            <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 p-8 sm:p-12 text-center space-y-6">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                {homepage.ctaHeadline}
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+                {homepage.ctaSubtext}
+              </p>
+              <div className="flex flex-wrap justify-center gap-3 pt-2">
+                <EmailButton
+                  email={contact.email}
+                  label={`Email ${firstName}`}
+                  size="default"
+                  className="rounded-lg px-6 h-11 btn-gradient text-sm font-medium cursor-pointer"
+                />
+                <Button
+                  asChild
+                  size="default"
+                  variant="outline"
+                  className="rounded-lg px-5 h-11 border-zinc-200 dark:border-zinc-700 bg-background text-sm font-medium"
+                >
+                  <a href={contact.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                    <Linkedin className="w-4 h-4 mr-2 text-zinc-500" />
+                    Open LinkedIn
+                  </a>
+                </Button>
               </div>
-            </motion.div>
+            </div>
           </section>
         </div>
       </main>
 
-      <footer className="py-12 border-t bg-slate-50/50 dark:bg-slate-950/50">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex flex-col items-center md:items-start gap-2">
+      {/* ============================================================== */}
+      {/* FOOTER: With Extra Bottom Clearance so Floating FAB Never Overlaps */}
+      {/* ============================================================== */}
+      <footer className="pt-12 pb-28 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col items-center md:items-start gap-1">
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} {resumeViewModel.name}.
             </p>
             <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-              Built with <Cpu className="w-2.5 h-2.5" /> Cloudflare Workers & React
+              Built with <Cpu className="w-3 h-3 text-zinc-400" /> Cloudflare Workers & React
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-background px-4 py-2 rounded-full border shadow-sm">
-            <Bot className="w-3.5 h-3.5 text-blue-600" />
-            <span>AI Usage Note: Requests are subject to server limits</span>
+          <div className="text-xs text-muted-foreground bg-background px-3.5 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800">
+            <span>Requests subject to AI server limits</span>
           </div>
         </div>
+
+        {/* Profile Links with Full Visibility & Clearance */}
         <ProfileLinks
           profiles={[{ label: 'LinkedIn', url: contact.linkedinUrl }, ...contact.profiles]}
         />
       </footer>
+
+      {/* Compact Floating AI Twin Launcher */}
       <ResumeChat />
     </div>
   )
