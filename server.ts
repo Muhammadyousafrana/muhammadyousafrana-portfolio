@@ -37,7 +37,18 @@ app.use('*', logger())
 
 // Bind environment variables from process.env
 app.use('*', async (c, next) => {
+  const host = c.req.header('x-forwarded-host') || c.req.header('host')
+  const proto = c.req.header('x-forwarded-proto') || 'https'
+  const origin = host ? `${proto}://${host}` : undefined
+  const configuredOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+    : []
+  if (origin && !configuredOrigins.includes(origin)) {
+    configuredOrigins.push(origin)
+  }
+
   c.env = {
+    ALLOWED_ORIGINS: configuredOrigins.join(','),
     AI_PROVIDER: process.env.AI_PROVIDER || 'google-ai-studio',
     GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     SECURITY_HMAC_SECRET:
