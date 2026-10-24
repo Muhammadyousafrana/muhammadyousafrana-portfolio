@@ -1,7 +1,8 @@
 // Inherited project rule: treat this file as audited infrastructure and change it
 // only with care. This template fork edits it deliberately to inject SEO tags from
 // content (see seoIndexHtmlPlugin below); keep other machinery here intact.
-import { cloudflare } from '@cloudflare/vite-plugin'
+// Cloudflare vite plugin commented out for Heroku / Node.js build
+// import { cloudflare } from '@cloudflare/vite-plugin'
 import react from '@vitejs/plugin-react'
 import { exec } from 'node:child_process'
 import path from 'path'
@@ -139,7 +140,7 @@ export default ({ mode, command }: { mode: string; command: 'build' | 'serve' })
   return defineConfig({
     plugins: [
       react(),
-      cloudflare({ remoteBindings: command !== 'serve' }),
+      // cloudflare({ remoteBindings: command !== 'serve' }),
       seoIndexHtmlPlugin(),
       watchDependenciesPlugin(),
       reloadTriggerPlugin(),

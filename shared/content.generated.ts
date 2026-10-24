@@ -310,6 +310,20 @@ export const generatedContent = {
       ]
     },
     {
+      "id": "medical-paper-classifier",
+      "name": "Medical Paper Classifier",
+      "description": "Contextual sentence classification framework for medical and biomedical research abstracts.",
+      "bullets": [
+        "Developed a TensorFlow NLP model to classify sections (e.g., Abstract, Methods) in medical research papers."
+      ],
+      "links": [
+        {
+          "label": "Article",
+          "url": "https://www.researchgate.net/profile/Muhammad-Rana-44/publication/393600460_An_Optimized_Framework_for_Contextual_Sentence_Classification_in_Biomedical_Abstracts/links/6870df4cae516743559bf291/An-Optimized-Framework-for-Contextual-Sentence-Classification-in-Biomedical-Abstracts.pdf"
+        }
+      ]
+    },
+    {
       "id": "additional-github-projects",
       "name": "Additional GitHub Projects",
       "description": "More repositories featured on my resume.",

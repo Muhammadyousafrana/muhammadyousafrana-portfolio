@@ -1,5 +1,23 @@
-import { DurableObject } from 'cloudflare:workers'
+// Commented out Cloudflare-specific import for Node.js / Heroku runtime
+// import { DurableObject } from 'cloudflare:workers'
 import type { Env } from './core-utils'
+
+export class DurableObjectBase<T = unknown> {
+  ctx = {
+    storage: {
+      get: async <U = any>(_key: string): Promise<U | undefined> => undefined,
+      put: async <U = any>(_key: string, _value: U): Promise<void> => {},
+      delete: async (_key: string): Promise<boolean> => false,
+      list: async <U = any>(_options?: any): Promise<Map<string, U>> => new Map(),
+      setAlarm: async (_time: number): Promise<void> => {},
+      getAlarm: async (): Promise<number | null> => null,
+    },
+  }
+  constructor(
+    public state?: any,
+    public env?: T
+  ) {}
+}
 
 interface RateLimitRecord {
   count: number
@@ -32,7 +50,7 @@ export type ContactHandoffClaimResult =
   | { kind: 'pending' }
   | { kind: 'completed'; result: unknown }
 
-export class AppController extends DurableObject<Env> {
+export class AppController extends DurableObjectBase<Env> {
   private sanitizeKey(value: string, maxLength = 256): string {
     return value.trim().slice(0, maxLength)
   }
