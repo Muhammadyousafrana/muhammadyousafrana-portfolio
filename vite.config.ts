@@ -134,13 +134,92 @@ function reloadTriggerPlugin() {
   }
 }
 
+function nodeApiPlugin(): Plugin {
+  return {
+    name: 'node-api-server',
+    async configureServer(server) {
+      const fs = await import('node:fs')
+      const path = await import('node:path')
+      for (const envFile of ['.env', '.env.local', '.dev.vars']) {
+        const filePath = path.resolve(process.cwd(), envFile)
+        if (fs.existsSync(filePath)) {
+          const lines = fs.readFileSync(filePath, 'utf-8').split('\n')
+          for (const line of lines) {
+            const trimmed = line.trim()
+            if (trimmed && !trimmed.startsWith('#')) {
+              const eqIdx = trimmed.indexOf('=')
+              if (eqIdx > 0) {
+                const key = trimmed.slice(0, eqIdx).trim()
+                const val = trimmed.slice(eqIdx + 1).trim()
+                if (!process.env[key]) {
+                  process.env[key] = val
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const { Hono } = await import('hono')
+      const { getRequestListener } = await import('@hono/node-server')
+      const { withOriginPolicy } = await import('./worker/security')
+      const { userRoutes } = await import('./worker/userRoutes')
+
+      const app = new Hono<any>()
+      app.use('*', async (c, next) => {
+        c.env = {
+          AI_PROVIDER: process.env.AI_PROVIDER || 'google-ai-studio',
+          GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+          SECURITY_HMAC_SECRET:
+            process.env.SECURITY_HMAC_SECRET || 'dev-hmac-secret-at-least-32-characters-long',
+          REQUIRE_TURNSTILE: 'false',
+          SESSION_COOKIE_NAME: process.env.SESSION_COOKIE_NAME || 'chat_tenant',
+          SESSION_COOKIE_MAX_AGE_SECONDS: process.env.SESSION_COOKIE_MAX_AGE_SECONDS || '2592000',
+          RATE_LIMIT_WINDOW_SECONDS: process.env.RATE_LIMIT_WINDOW_SECONDS || '60',
+          CHAT_RATE_LIMIT_PER_TENANT: process.env.CHAT_RATE_LIMIT_PER_TENANT || '40',
+          CHAT_RATE_LIMIT_PER_IP: process.env.CHAT_RATE_LIMIT_PER_IP || '80',
+          AI_RATE_LIMIT_PER_TENANT: process.env.AI_RATE_LIMIT_PER_TENANT || '12',
+          AI_RATE_LIMIT_PER_IP: process.env.AI_RATE_LIMIT_PER_IP || '24',
+          MAX_CHAT_REQUEST_BYTES: process.env.MAX_CHAT_REQUEST_BYTES || '16384',
+          MAX_FIT_ANALYZE_BYTES: process.env.MAX_FIT_ANALYZE_BYTES || '24576',
+          MAX_CLIENT_ERROR_BYTES: process.env.MAX_CLIENT_ERROR_BYTES || '16384',
+          CLIENT_ERROR_RATE_LIMIT_PER_IP: process.env.CLIENT_ERROR_RATE_LIMIT_PER_IP || '30',
+          ...c.env,
+        }
+        await next()
+      })
+
+      app.use('/api/*', withOriginPolicy)
+      userRoutes(app)
+
+      app.get('/api/health', (c) =>
+        c.json({
+          success: true,
+          data: {
+            status: 'healthy',
+            timestamp: new Date().toISOString(),
+          },
+        })
+      )
+
+      const listener = getRequestListener(app.fetch)
+      server.middlewares.use((req: any, res: any, next: any) => {
+        if (req.url && (req.url.startsWith('/api/') || req.url === '/api')) {
+          return listener(req, res)
+        }
+        next()
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default ({ mode, command }: { mode: string; command: 'build' | 'serve' }) => {
   const env = loadEnv(mode, process.cwd())
   return defineConfig({
     plugins: [
       react(),
-      // cloudflare({ remoteBindings: command !== 'serve' }),
+      nodeApiPlugin(),
       seoIndexHtmlPlugin(),
       watchDependenciesPlugin(),
       reloadTriggerPlugin(),

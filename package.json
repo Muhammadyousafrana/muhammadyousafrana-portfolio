@@ -29,7 +29,7 @@
     "test": "bun test",
     "weather:smoke": "bun --no-env-file scripts/weather-smoke.ts",
     "preview": "bun run build && vite preview --host 0.0.0.0 --port ${PORT:-4173}",
-    "prepare": "lefthook install",
+    "prepare": "node -e \"if (process.env.NODE_ENV !== 'production' && require('fs').existsSync('.git')) { try { require('child_process').execSync('lefthook install', { stdio: 'inherit' }); } catch (e) {} }\"",
     "predeploy:validate": "bun --no-env-file scripts/predeploy-validate.mjs",
     "smoke:ai": "bun --no-env-file scripts/smoke-ai-health.mjs",
     "smoke:ai:online": "bun --no-env-file scripts/smoke-ai-online.ts",

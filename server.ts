@@ -9,6 +9,27 @@ import type { Env } from './worker/core-utils'
 import { withOriginPolicy } from './worker/security'
 import { userRoutes } from './worker/userRoutes'
 
+// Load local env files if present
+for (const envFile of ['.env', '.env.local', '.dev.vars']) {
+  const filePath = path.resolve(process.cwd(), envFile)
+  if (fs.existsSync(filePath)) {
+    const lines = fs.readFileSync(filePath, 'utf-8').split('\n')
+    for (const line of lines) {
+      const trimmed = line.trim()
+      if (trimmed && !trimmed.startsWith('#')) {
+        const eqIdx = trimmed.indexOf('=')
+        if (eqIdx > 0) {
+          const key = trimmed.slice(0, eqIdx).trim()
+          const val = trimmed.slice(eqIdx + 1).trim()
+          if (!process.env[key]) {
+            process.env[key] = val
+          }
+        }
+      }
+    }
+  }
+}
+
 const app = new Hono<{ Bindings: Env }>()
 
 // Middleware
