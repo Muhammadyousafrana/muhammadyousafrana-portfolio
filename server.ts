@@ -85,9 +85,7 @@ app.get('/api/health', (c) =>
 )
 
 // Serve static assets from dist/
-app.use('/assets/*', serveStatic({ root: './dist' }))
-app.use('/icon.svg', serveStatic({ root: './dist' }))
-app.use('/favicon.ico', serveStatic({ root: './dist' }))
+app.use('/*', serveStatic({ root: './dist' }))
 
 // SPA fallback: any non-API route returns dist/index.html
 app.get('*', async (c) => {
